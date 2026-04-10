@@ -44,27 +44,6 @@
 
 ---
 
-### `/code-review-expert` — 专家级代码审查
-
-从 GitHub 引入的精简版审查 skill，不含 Python 工具链步骤，语言无关，适合快速架构审查。
-
-**审查流程（7 步）：**
-
-1. 预检上下文 — 确定变更范围，支持大型 diff 分批审查
-2. SOLID + 架构审查 — 检查五大原则违反，提出渐进式重构方案
-3. 冗余代码识别 — 未使用代码、已关闭 feature flag 的清理计划
-4. 安全与可靠性扫描 — 注入、认证/授权漏洞、竞态条件、不安全默认配置
-5. 代码质量扫描 — 错误处理、性能热点、边界条件
-6. 生成审查报告 — P0–P3 分级 + 行内注释格式
-7. 确认下一步 — 用户选择修复范围
-
-**与 `/code-review` 的区别：**
-- 无 Flake8 / Black / isort / Mypy 工具链步骤
-- 不限定 Python，适用于任何语言
-- 更侧重架构和安全深度分析
-
----
-
 ### `/req-doc-generator` — 需求文档生成
 
 按三阶段流水线生成完整模块设计文档，每个阶段的输出是下一阶段的输入依据。
@@ -120,14 +99,6 @@ skills/
 │       ├── security-risks.md       # 安全风险检查清单
 │       ├── code-quality.md         # 代码质量检查清单
 │       └── cleanup-plan.md         # 冗余代码清理模板
-├── code-review-expert/             # 精简版（语言无关，无工具链）
-│   ├── SKILL.md
-│   ├── agents/agent.yaml
-│   └── references/
-│       ├── solid-checklist.md
-│       ├── security-checklist.md
-│       ├── code-quality-checklist.md
-│       └── removal-plan.md
 └── req-doc-generator/
     ├── SKILL.md                    # 三阶段流水线定义
     ├── evals/evals.json            # 10 个评估用例

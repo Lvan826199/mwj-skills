@@ -44,27 +44,6 @@ Or say: "review my code", "check the code", "code review".
 
 ---
 
-### `/code-review-expert` — Expert Code Review
-
-A lightweight review skill imported from GitHub — no Python toolchain steps, language-agnostic, ideal for quick architectural reviews.
-
-**Review Pipeline (7 steps):**
-
-1. Preflight context — scope changes, batch review for large diffs
-2. SOLID + architecture review — check all five principles, propose incremental refactors
-3. Dead code detection — unused code, stale feature flags, cleanup plans
-4. Security & reliability scan — injection, auth gaps, race conditions, insecure defaults
-5. Code quality scan — error handling, performance hotspots, boundary conditions
-6. Generate report — P0–P3 findings + inline comment format
-7. Confirm next steps — user chooses fix scope
-
-**Differences from `/code-review`:**
-- No Flake8 / Black / isort / Mypy toolchain steps
-- Not limited to Python — works with any language
-- More focused on architecture and security depth analysis
-
----
-
 ### `/req-doc-generator` — Requirements Doc Generator
 
 Generates complete module design documents through a three-stage pipeline, where each stage's output feeds the next.
@@ -120,14 +99,6 @@ skills/
 │       ├── security-risks.md       # Security risks checklist
 │       ├── code-quality.md         # Code quality checklist
 │       └── cleanup-plan.md         # Dead code cleanup template
-├── code-review-expert/             # Lightweight version (language-agnostic, no toolchain)
-│   ├── SKILL.md
-│   ├── agents/agent.yaml
-│   └── references/
-│       ├── solid-checklist.md
-│       ├── security-checklist.md
-│       ├── code-quality-checklist.md
-│       └── removal-plan.md
 └── req-doc-generator/
     ├── SKILL.md                    # Three-stage pipeline definition
     ├── evals/evals.json            # 10 evaluation test cases
