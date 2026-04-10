@@ -1,6 +1,6 @@
 # mwj-skills
 
-A personal Claude Code Skills collection with automated workflows for code review, requirements documentation, and more.
+A personal by mengwuji with Claude Code Skills collection with automated workflows for code review, requirements documentation, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [中文](README.md)

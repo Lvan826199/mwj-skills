@@ -1,6 +1,6 @@
 # mwj-skills
 
-Claude Code 个人 Skills 集合，包含代码审查、需求文档生成等自动化工作流。
+梦无矶 Claude Code 个人 Skills 集合，包含代码审查、需求文档生成等自动化工作流。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [English](README.en.md)
