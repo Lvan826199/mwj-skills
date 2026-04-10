@@ -56,10 +56,10 @@ skills/
 ├── code-review/
 │   ├── SKILL.md                    # 主 skill 文件
 │   └── references/
-│       ├── solid-checklist.md      # SOLID 原则检查清单
-│       ├── security-checklist.md   # 安全风险检查清单
-│       ├── code-quality-checklist.md
-│       └── removal-plan.md         # 冗余代码清理模板
+│       ├── solid-principles.md     # SOLID 原则检查清单
+│       ├── security-risks.md       # 安全风险检查清单
+│       ├── code-quality.md         # 代码质量检查清单
+│       └── cleanup-plan.md         # 冗余代码清理模板
 ├── code-review-expert/             # GitHub 引入的精简版（参考用）
 │   ├── SKILL.md
 │   ├── agents/agent.yaml
@@ -140,10 +140,10 @@ skills/
 ├── code-review/
 │   ├── SKILL.md                    # Main skill file
 │   └── references/
-│       ├── solid-checklist.md      # SOLID principles checklist
-│       ├── security-checklist.md   # Security risk checklist
-│       ├── code-quality-checklist.md
-│       └── removal-plan.md         # Redundant code cleanup template
+│       ├── solid-principles.md     # SOLID principles checklist
+│       ├── security-risks.md       # Security risk checklist
+│       ├── code-quality.md         # Code quality checklist
+│       └── cleanup-plan.md         # Redundant code cleanup template
 ├── code-review-expert/             # Streamlined version from GitHub (reference)
 │   ├── SKILL.md
 │   ├── agents/agent.yaml

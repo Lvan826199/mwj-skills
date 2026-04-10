@@ -60,7 +60,7 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 
 ### 第三步：SOLID 原则与架构审查
 
-加载 `references/solid-checklist.md` 进行专项检查：
+加载 `references/solid-principles.md` 进行专项检查：
 
 - **SRP（单一职责）**：模块是否承担了不相关的多个职责
 - **OCP（开闭原则）**：添加新行为是否需要修改核心逻辑而非扩展
@@ -72,7 +72,7 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 
 ### 第四步：冗余代码识别与迭代计划
 
-加载 `references/removal-plan.md` 作为模板：
+加载 `references/cleanup-plan.md` 作为模板：
 
 - 识别未使用、冗余或已关闭特性开关的代码
 - 区分**立即可安全删除**与**需要计划后延迟删除**
@@ -80,7 +80,7 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 
 ### 第五步：安全与可靠性扫描
 
-加载 `references/security-checklist.md` 进行全面检查：
+加载 `references/security-risks.md` 进行全面检查：
 
 - XSS、注入（SQL/NoSQL/命令注入）、SSRF、路径遍历
 - 认证/授权漏洞、缺失的租户检查
@@ -93,7 +93,7 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 
 ### 第六步：代码质量扫描
 
-加载 `references/code-quality-checklist.md` 进行检查：
+加载 `references/code-quality.md` 进行检查：
 
 - **错误处理**：吞掉的异常、过于宽泛的 catch、缺失的错误处理、异步错误
 - **性能**：N+1 查询、热路径中的 CPU 密集操作、缺失缓存、无界内存增长
@@ -386,10 +386,10 @@ uv run black app/ && uv run isort app/
 
 | 文件 | 用途 |
 |------|------|
-| `references/solid-checklist.md` | SOLID 代码异味提示与重构启发式方法 |
-| `references/security-checklist.md` | Web/应用安全与运行时风险清单 |
-| `references/code-quality-checklist.md` | 错误处理、性能、边界条件 |
-| `references/removal-plan.md` | 删除候选项与后续计划模板 |
+| `references/solid-principles.md` | SOLID 代码异味提示与重构启发式方法 |
+| `references/security-risks.md` | Web/应用安全与运行时风险清单 |
+| `references/code-quality.md` | 错误处理、性能、边界条件 |
+| `references/cleanup-plan.md` | 删除候选项与后续计划模板 |
 
 ---
 
