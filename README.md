@@ -1,39 +1,81 @@
 # mwj-skills
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+Claude Code 个人 Skills 集合，包含代码审查、需求文档生成等自动化工作流。
 
-#### 软件架构
-软件架构说明
+## Skills 列表
 
+### `/code-review` - 代码审查
 
-#### 安装教程
+对当前 git 变更进行全面审查，包括：
+- 自动运行 Flake8 / Black / isort / Mypy
+- SOLID 原则与架构审查
+- 安全漏洞扫描（XSS、注入、SSRF 等）
+- 代码质量检查（错误处理、性能、边界条件）
+- 冗余代码识别
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+审查结果按 P0~P3 优先级分级，等待用户确认后再修复。
 
-#### 使用说明
+**触发方式：**
+```
+/code-review
+```
+或直接说"帮我 review 代码"、"检查代码"、"代码审查"。
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+**自动触发：** 已配置 `.claude/settings.json` hook，执行 `git commit` 前自动触发审查，发现 P0/P1 问题时阻止提交。
 
-#### 参与贡献
+---
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+### `/code-review-expert` - 专家级代码审查
 
+从 GitHub 引入的精简版审查 skill，不含工具链检查，专注于架构和安全深度分析。与 `/code-review` 的区别：无 Python 工具链步骤，语言无关，适合快速架构审查。
 
-#### 特技
+---
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+### `/req-doc-generator` - 需求文档生成
+
+按三阶段流水线生成完整模块设计文档：
+
+1. 需求文档（功能需求、非功能需求、用例）
+2. 数据库设计（表结构、字段、索引、关系）
+3. API 设计（接口定义、请求/响应格式）
+
+每个阶段用户确认后再进入下一阶段。
+
+**触发方式：**
+```
+/req-doc-generator
+```
+或说"写需求文档"、"生成需求文档"、"设计数据库"、"设计 API 接口"。
+
+---
+
+## 目录结构
+
+```
+skills/
+├── code-review/
+│   ├── SKILL.md                    # 主 skill 文件
+│   └── references/
+│       ├── solid-checklist.md      # SOLID 原则检查清单
+│       ├── security-checklist.md   # 安全风险检查清单
+│       ├── code-quality-checklist.md
+│       └── removal-plan.md         # 冗余代码清理模板
+├── code-review-expert/             # GitHub 引入的精简版（参考用）
+│   ├── SKILL.md
+│   ├── agents/agent.yaml
+│   └── references/
+└── req-doc-generator/
+    ├── SKILL.md
+    └── templates/
+
+.claude/
+└── settings.json                   # 项目级 hook 配置（git commit 前自动审查）
+```
+
+## Hook 配置说明
+
+`.claude/settings.json` 配置了 `PreToolUse` hook，在执行 `git commit` 前自动触发代码审查。发现 P0/P1 级别问题时会阻止提交。
+
+如需在其他项目使用相同 hook，将 `.claude/settings.json` 复制到对应项目根目录即可。
+
+如需全局生效（所有项目），将 hook 配置合并到 `~/.claude/settings.json`。

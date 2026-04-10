@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "检查即将执行的 bash 命令是否包含 'git commit'。如果是，先对当前 git 变更进行代码审查（运行 Flake8/Black/isort 检查，并检查 SOLID 原则、安全风险、代码质量），审查通过后再允许提交；如果发现严重问题（P0/P1）则阻止提交并告知用户。如果不是 git commit 命令，直接允许执行。命令内容：$ARGUMENTS",
+            "statusMessage": "代码审查中，请稍候..."
+          }
+        ]
+      }
+    ]
+  }
+}
