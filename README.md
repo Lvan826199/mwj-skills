@@ -82,8 +82,6 @@ skills/
 
 ---
 
----
-
 # mwj-skills (English)
 
 A personal Claude Code Skills collection featuring automated workflows for code review, requirements documentation, and more.
