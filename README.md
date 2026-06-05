@@ -1,9 +1,8 @@
 # mwj-skills
 
-梦无矶 Claude Code 个人 Skills 集合，包含代码审查、需求文档生成等自动化工作流。
+梦无矶 Claude Code 个人 Skills 集合，包含代码审查、需求文档生成、前端设计规范执行等自动化工作流。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[English](README.en.md)
 
 ---
 
@@ -88,27 +87,128 @@
 
 ---
 
+### `/mwj-design-system` — MWJ 设计系统规范执行器
+
+MWJ Design System v1.2 前端开发规范执行器，确保所有前端代码输出严格遵循 Mwj 一体化测试平台设计系统。
+
+**适用场景：** 开发/重构 Vue 组件、前端页面、UI 界面；涉及 Vue3 + TypeScript + TailwindCSS + Element Plus 的任何前端开发任务。
+
+**执行流程（三阶段）：**
+
+```
+Phase 1 · 分析阶段
+  → 读取 MWJ 设计规范
+  → 判断页面/组件类型（登录页/管理类/接口测试/功能测试/报告看板等）
+  → 决策是否补充查询 ui-ux-pro-max-new（图表/动效/Vue 最佳实践/可访问性）
+        ↓
+Phase 2 · 实现阶段
+  → 应用 MWJ Design Token（颜色/圆角/阴影/间距/字体/动效 CSS 变量）
+  → 编写代码（Vue3 script setup + TS + TailwindCSS + SCSS）
+  → 使用 Mwj*/MwjBiz* 前缀组件
+        ↓
+Phase 3 · 交付阶段
+  → 过完整自检清单（Token 合规/视觉质量/交互质量/数据状态/可访问性）
+```
+
+**权威优先级：**
+1. MWJ Design Token — 最高优先级，不可覆盖
+2. MWJ 组件规范（`Mwj*` / `MwjBiz*` 前缀、Element Plus 封装）
+3. MWJ 布局系统（Header 64px / Sidebar 240px / 12 栅格）
+4. `ui-ux-pro-max-new` 查询结果 — 补充参考，不得与 MWJ Token 冲突
+
+**核心 Token 速览：**
+
+| 类别 | 示例 |
+|------|------|
+| 品牌色 | `--color-primary: #1677FF` |
+| 背景 | `--bg-page: #F5F7FB` / `--bg-card: #FFFFFF` |
+| 间距 | `--space-1`(4px) 到 `--space-8`(64px) |
+| 圆角 | `--radius-sm`(8px) / `--radius-xl`(24px) |
+| 阴影 | `--shadow-sm` / `--shadow-md` / `--shadow-lg` |
+| 动效 | `--duration-fast`(120ms) / `--duration-base`(200ms) |
+
+**触发方式：**
+```
+/mwj-design-system
+```
+或说"写个页面"、"创建组件"、"重构前端"、"实现 UI"，以及任何涉及本项目前端开发的任务。
+
+---
+
+### `/ui-ux-pro-max-new` — UI/UX 设计智能助手
+
+综合 UI/UX 设计指南，内置 67 种风格、96 套配色、57 种字体搭配、99 条 UX 准则、25 种图表类型，覆盖 13 个技术栈。
+
+**数据库概览：**
+
+| 维度 | 内容 |
+|------|------|
+| 风格 | Glassmorphism、Claymorphism、Minimalism、Brutalism、Neumorphism、Bento Grid、Dark Mode 等 67 种 |
+| 配色 | SaaS、电商、医疗、美业、金融科技等 96 套 |
+| 字体 | Google Fonts 精选搭配 57 种 |
+| 图表 | ECharts / D3 图表类型推荐 25 种 |
+| 技术栈 | React、Next.js、Vue、Svelte、SwiftUI、React Native、Flutter、Tailwind、shadcn/ui 等 13 种 |
+
+**搜索命令：**
+
+```bash
+# 生成完整设计系统（推荐首次使用）
+python3 skills/ui-ux-pro-max-new/scripts/search.py "beauty spa wellness" --design-system -p "项目名"
+
+# 按领域查询
+python3 skills/ui-ux-pro-max-new/scripts/search.py "trend dashboard" --domain chart
+python3 skills/ui-ux-pro-max-new/scripts/search.py "animation loading" --domain ux
+python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stack vue
+```
+
+**与 mwj-design-system 的关系：**
+
+在 MWJ 项目中，本 skill 作为 `mwj-design-system` 的**补充**，仅用于图表类型推荐、复杂动效模式、Vue 最佳实践和可访问性指引。MWJ Design Token 始终优先。
+
+**触发方式：**
+```
+/ui-ux-pro-max-new
+```
+或涉及非 MWJ 项目的 UI 设计、配色选择、字体搭配、图表推荐等任务。
+
+---
+
 ## 目录结构
 
 ```
 skills/
 ├── code-review/
-│   ├── SKILL.md                    # 主 skill 文件（9 步审查流程）
+│   ├── SKILL.md                        # 主 skill 文件（9 步审查流程）
 │   └── references/
-│       ├── solid-principles.md     # SOLID 原则检查清单
-│       ├── security-risks.md       # 安全风险检查清单
-│       ├── code-quality.md         # 代码质量检查清单
-│       └── cleanup-plan.md         # 冗余代码清理模板
-└── req-doc-generator/
-    ├── SKILL.md                    # 三阶段流水线定义
-    ├── evals/evals.json            # 10 个评估用例
-    └── templates/
-        ├── requirement-template.md     # 需求文档模板（7 章节）
-        ├── database-design-template.md # 数据库设计模板
-        └── api-design-template.md      # API 设计文档模板
+│       ├── solid-principles.md         # SOLID 原则检查清单
+│       ├── security-risks.md           # 安全风险检查清单
+│       ├── code-quality.md             # 代码质量检查清单
+│       └── cleanup-plan.md             # 冗余代码清理模板
+├── req-doc-generator/
+│   ├── SKILL.md                        # 三阶段流水线定义
+│   ├── evals/evals.json                # 10 个评估用例
+│   └── templates/
+│       ├── requirement-template.md     # 需求文档模板（7 章节）
+│       ├── database-design-template.md # 数据库设计模板
+│       └── api-design-template.md      # API 设计文档模板
+├── mwj-design-system/
+│   └── SKILL.md                        # MWJ Design System v1.2 执行规范
+└── ui-ux-pro-max-new/
+    ├── SKILL.md                        # 设计智能助手主文件
+    ├── data/                           # 设计数据库（配色/图表/风格/排版等 CSV）
+    │   ├── colors.csv
+    │   ├── charts.csv
+    │   ├── styles.csv
+    │   ├── typography.csv
+    │   ├── ux-guidelines.csv
+    │   └── stacks/                     # 各技术栈最佳实践
+    └── scripts/                        # Python 搜索脚本
+        ├── search.py
+        ├── core.py
+        └── design_system.py
 
 .claude/
-└── settings.json                   # 项目级 hook 配置（git commit 前自动审查）
+└── settings.json                       # 项目级 hook 配置（git commit 前自动审查）
 ```
 
 ## Hook 配置说明
