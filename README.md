@@ -8,21 +8,21 @@
 
 ## Skills 列表
 
-### `/code-review` — 代码审查
+### `/py-code-review` — Python 代码审查
 
-自动化代码审查流程，结合工具检查与资深工程师视角的深度审查。
+Python 代码审查流程，结合工具检查与资深工程师视角的深度审查。审查优先：先报告，经用户确认后再修复。
 
 **审查流程（9 步）：**
 
 1. 预检上下文 — `git diff` 确定变更范围，识别关键路径
-2. 运行工具链 — 按顺序执行 Flake8 → Black → isort → Mypy
+2. 运行工具链（只读检查） — 探测项目工具链（uv/poetry/pip）后按顺序执行 Flake8 → Black `--check` → isort `--check-only` → Mypy，不修改代码
 3. SOLID 原则审查 — SRP / OCP / LSP / ISP / DIP 逐项检查
 4. 冗余代码识别 — 区分"立即可删"与"需计划后删"
 5. 安全扫描 — XSS、注入、SSRF、路径遍历、竞态条件、密钥泄露等
 6. 代码质量扫描 — 错误处理、N+1 查询、边界条件、静默失败
-7. 工具结果分析 — 自动修复常见问题（未使用导入、布尔比较、f-string 等）
+7. 工具结果分析 — 归类常见问题（未使用导入、布尔比较、f-string 等）
 8. 生成审查报告 — 按 P0–P3 分级输出，含统计信息
-9. 确认下一步 — 等待用户选择修复范围后再执行
+9. 确认下一步 — 等待用户选择修复范围后再执行所有修复（含格式化）
 
 **审查结果分级：**
 
@@ -35,11 +35,13 @@
 
 **触发方式：**
 ```
-/code-review
+/py-code-review
 ```
 或直接说"帮我 review 代码"、"检查代码"、"代码审查"。
 
-**自动触发：** 已配置 `.claude/settings.json` hook，执行 `git commit` 前自动触发审查，发现 P0/P1 问题时阻止提交。
+> 命名为 `py-code-review` 是为了避免与 Claude Code 内置的 `/code-review` 命令冲突。
+
+**Hook 触发：** 已配置 `.claude/settings.json` hook，执行 `git commit` 前会拦截未经审查的提交（详见文末「Hook 配置说明」）。
 
 ---
 
@@ -177,7 +179,7 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 
 ```
 skills/
-├── code-review/
+├── py-code-review/
 │   ├── SKILL.md                        # 主 skill 文件（9 步审查流程）
 │   └── references/
 │       ├── solid-principles.md         # SOLID 原则检查清单
@@ -192,7 +194,9 @@ skills/
 │       ├── database-design-template.md # 数据库设计模板
 │       └── api-design-template.md      # API 设计文档模板
 ├── mwj-design-system/
-│   └── SKILL.md                        # MWJ Design System v1.2 执行规范
+│   ├── SKILL.md                        # MWJ Design System v1.2 执行规范
+│   └── references/
+│       └── migration-guide.md          # SCSS → CSS Token 迁移实战规则
 └── ui-ux-pro-max-new/
     ├── SKILL.md                        # 设计智能助手主文件
     ├── data/                           # 设计数据库（配色/图表/风格/排版等 CSV）
@@ -208,16 +212,29 @@ skills/
         └── design_system.py
 
 .claude/
-└── settings.json                       # 项目级 hook 配置（git commit 前自动审查）
+├── settings.json                       # 项目级 hook 配置
+└── hooks/
+    └── check-commit.py                 # git commit 拦截脚本
+
+docs/
+├── changelog.md                        # 版本更新日志
+└── bug-fixes.md                        # Bug 修复记录
 ```
 
 ## Hook 配置说明
 
-`.claude/settings.json` 配置了 `PreToolUse` hook，在执行 `git commit` 前自动触发代码审查。发现 P0/P1 级别问题时会阻止提交。
+`.claude/settings.json` 配置了 `PreToolUse` hook（command 类型，确定性脚本匹配，不消耗 LLM 调用）：
 
-如需在其他项目使用相同 hook，将 `.claude/settings.json` 复制到对应项目根目录即可。
+- 普通 Bash 命令直接放行，无额外开销
+- `git commit` 命令会被 `.claude/hooks/check-commit.py` 拦截，提示先用 `py-code-review` skill 完成代码审查
+- 审查通过（无 P0/P1 问题）后，在提交命令末尾附加 `# review-passed` 标记即可放行：
+  ```bash
+  git commit -m "fix(scope): 描述" # review-passed
+  ```
 
-如需全局生效（所有项目），将 hook 配置合并到 `~/.claude/settings.json`。
+如需在其他项目使用相同 hook，将 `.claude/settings.json` 与 `.claude/hooks/` 一并复制到对应项目根目录即可。
+
+如需全局生效（所有项目），将 hook 配置合并到 `~/.claude/settings.json`（注意脚本路径需改为绝对路径或随之迁移）。
 
 ---
 
