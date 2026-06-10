@@ -21,7 +21,7 @@
 
 | Skill | 触发方式 | 用途 |
 |-------|----------|------|
-| `code-review` | `/code-review` | Python 代码审查（9 步流程，P0–P3 分级） |
+| `py-code-review` | `/py-code-review` | Python 代码审查（9 步流程，P0–P3 分级） |
 | `req-doc-generator` | `/req-doc-generator` | 三阶段需求/数据库/API 文档生成 |
 | `mwj-design-system` | `/mwj-design-system` | MWJ Design System v1.2 前端规范执行器 |
 | `ui-ux-pro-max-new` | `/ui-ux-pro-max-new` | UI/UX 设计智能助手（67 风格/96 配色/13 技术栈） |
@@ -49,7 +49,7 @@
 - 计划文档放在项目根目录下的 `plan/` 目录，而不是默认的用户目录
 - 每一个任务必须完整经历以下阶段：
   1. 开发实现
-  2. 代码审查（使用 `code-review` skill）
+  2. 代码审查（使用 `py-code-review` skill）
   3. 功能测试
   4. 状态更新与代码提交
 
@@ -176,7 +176,7 @@ Claude Code 的记忆文件存放在 `.claude/memory/`，通过 `MEMORY.md` 索�
 ```
 feat(skill): 新增 mwj-design-system 前端规范执行器
 docs: 完善 README 各 skill 使用说明
-fix(code-review): 修复 P0 判定遗漏安全扫描场景
+fix(py-code-review): 修复 P0 判定遗漏安全扫描场景
 ```
 
 ### 推送规范

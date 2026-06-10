@@ -1,6 +1,6 @@
 ---
-name: code-review
-description: 自动化代码审查流程。运行代码质量检查工具（Flake8、Black、isort、Mypy），同时进行深度架构审查（SOLID原则、安全风险、代码质量），并提供修复建议。
+name: py-code-review
+description: Python 代码审查流程。运行代码质量检查工具（Flake8、Black、isort、Mypy），同时进行深度架构审查（SOLID原则、安全风险、代码质量），并提供修复建议。审查优先：先报告，经用户确认后再修复。
 ---
 
 # 代码审查技能
@@ -15,9 +15,9 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 - 用户提交代码前（git commit 之前）
 - 用户明确提到 "review"、"检查"、"质量"
 
-**自动触发：**
-- 每次使用 Edit/Write 工具修改 Python 代码后
-- 创建新的 Python 模块后
+**Hook 触发：**
+- 本仓库 `.claude/settings.json` 配置了 PreToolUse hook：执行 `git commit` 前会被拦截，需先完成本审查流程（详见 README「Hook 配置说明」）
+- skill 本身无法在 Edit/Write 后自动触发；如需类似行为，须在使用方项目中自行配置 hook
 
 ---
 
@@ -34,29 +34,36 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 - **大型 diff（>500 行）**：先按文件汇总，再按模块/功能区域分批审查
 - **混合关注点**：按逻辑功能分组，而非按文件顺序
 
-### 第二步：运行代码质量工具
+### 第二步：运行代码质量工具（只读检查）
 
-自动按以下顺序执行代码审查：
+**先探测项目工具链与检查范围，再执行：**
+- 工具调用方式：存在 `uv.lock` → `uv run <tool>`；存在 `poetry.lock` → `poetry run <tool>`；否则直接 `<tool>`
+- 检查范围：以第一步 `git diff` 涉及的文件/目录为准（下文记作 `<变更路径>`）
+- 工具参数：优先读取项目的 `setup.cfg` / `pyproject.toml` / `.flake8` 配置；项目无配置时才使用默认参数（行宽 88，忽略 E203/E501/W503）
+
+按以下顺序执行，**本步骤一律只检查、不修改代码**：
 
 1. **Flake8** - 代码规范检查
    ```bash
-   uv run flake8 app/ --max-line-length=88 --extend-ignore=E203,E501,W503 --statistics
+   flake8 <变更路径> --statistics
    ```
 
-2. **Black** - 代码格式化
+2. **Black** - 格式检查（仅 diff，不写入）
    ```bash
-   uv run black app/
+   black <变更路径> --check --diff
    ```
 
-3. **isort** - 导入排序
+3. **isort** - 导入排序检查（不写入）
    ```bash
-   uv run isort app/
+   isort <变更路径> --check-only --diff
    ```
 
-4. **Mypy** - 类型检查（可选）
+4. **Mypy** - 类型检查（建议默认启用）
    ```bash
-   uv run mypy app/
+   mypy <变更路径>
    ```
+
+> 所有修复（包括格式化与导入排序）统一在第九步用户确认后执行。
 
 ### 第三步：SOLID 原则与架构审查
 
@@ -220,36 +227,35 @@ description: 自动化代码审查流程。运行代码质量检查工具（Flak
 
 ---
 
-## 自动修复常见问题
+## 常见问题快速修复（第九步用户确认后执行）
 
-对于以下问题，自动修复并告知用户：
+用户在第九步确认修复范围后，以下问题可快速修复：
 
 - 删除未使用的导入
 - 修复布尔值比较
 - 修复 f-string 问题
 - 添加必要的 noqa 注释
+- 运行 `black` / `isort` 完成格式化与导入排序
 
 修复后重新运行检查，确保没有引入新问题。
 
 ---
 
-## 项目特定配置
+## 项目配置探测
 
-### 配置文件
-- `setup.cfg` - 所有工具的配置
-- `.pre-commit-config.yaml` - Git pre-commit 钩子
+本 skill 面向任意 Python 项目，不预设目录结构与工具链：
 
-### 代码规范
+### 配置来源（按优先级）
+- `setup.cfg` / `pyproject.toml` / `.flake8` - 工具参数以项目配置为准
+- `requires-python`（pyproject.toml）/ `.python-version` - 确定 Python 版本
+- `.pre-commit-config.yaml` - 若存在，说明项目已有提交前检查
+
+### 项目无配置时的默认约定
 - 最大行长度: 88 字符
-- Python 版本: 3.13
 - 格式化工具: Black
 - 导入排序: isort (black profile)
 - 代码检查: Flake8
-
-### 忽略的规则
-- E203: Black 格式化产生的空格
-- E501: 行长度（已在 Black 中处理）
-- W503: 二元运算符前的换行
+- 忽略规则（与 Black 配合）: E203（格式化空格）、E501（行长度由 Black 处理）、W503（二元运算符前换行）
 
 ---
 
@@ -335,21 +341,20 @@ git commit --no-verify -m "message"
 ### 建议的工作流程
 
 1. 修改代码
-2. 运行代码审查：`uv run flake8 app/ && uv run black app/ && uv run isort app/`
+2. 运行只读检查：`flake8 <变更路径> && black <变更路径> --check --diff && isort <变更路径> --check-only`
 3. 查看审查结果
-4. 修复问题
+4. 修复问题（经用户确认）
 5. 重新审查直到通过
-6. 提交代码：`git add . && git commit -m "message"`
+6. 提交代码：`git add <具体文件> && git commit -m "类型(范围): 描述"`（避免 `git add .` 误提交敏感文件）
 
 ---
 
 ## 注意事项
 
 ⚠️ **重要提醒：**
-- Black 会自动修改代码格式，提交前确保运行
-- isort 会重新排序导入，可能影响代码
+- Black / isort 的修复会改写代码，只能在第九步用户确认后执行
 - Flake8 发现的问题必须修复才能通过 pre-commit
-- Mypy 类型检查是可选的，但建议启用
+- Mypy 类型检查建议默认启用（配合全量类型注解）
 
 📝 **文档更新：**
 - 修复问题后，更新相关文档
@@ -366,18 +371,14 @@ git commit --no-verify -m "message"
 
 ## 快速命令
 
+> `<变更路径>` 为 git diff 涉及的文件/目录；按项目工具链补全前缀（`uv run` / `poetry run` / 无）。
+
 ```bash
-# 完整审查流程
-uv run flake8 app/ --max-line-length=88 --extend-ignore=E203,E501,W503 && uv run black app/ && uv run isort app/
+# 完整只读检查
+flake8 <变更路径> --statistics && black <变更路径> --check --diff && isort <变更路径> --check-only --diff && mypy <变更路径>
 
-# 仅检查不修改
-uv run flake8 app/ --diff
-
-# 查看格式化差异
-uv run black app/ --diff
-
-# 修复所有问题
-uv run black app/ && uv run isort app/
+# 修复格式与导入排序（仅在用户确认后执行）
+black <变更路径> && isort <变更路径>
 ```
 
 ---
@@ -398,15 +399,20 @@ uv run black app/ && uv run isort app/
 **用户**: "我刚修改了 auth.py"
 
 **Claude**:
-好的，让我对 `app/api/v1/endpoints/auth.py` 进行代码审查...
+好的，让我对 `auth.py` 进行代码审查...
 
-[运行检查工具 + 深度审查]
+[运行只读检查 + 深度审查]
 
-✅ 审查完成！发现 2 个问题：
+✅ 审查完成！发现 2 个问题（P2: 2）：
 1. 第 8 行：未使用的导入 `timedelta`
 2. 第 45 行：布尔值比较 `== True`
 
-已自动修复这些问题。代码现在符合规范。
+您希望如何处理？1. 全部修复 2. 修复指定项 3. 无需修改
+
+**用户**: "全部修复"
+
+**Claude**:
+已修复以上 2 个问题，并重新运行检查确认无新增问题。
 
 **用户**: "帮我审查整个项目"
 
