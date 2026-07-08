@@ -177,9 +177,9 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 
 ### `/delegate-to-cli` — 子任务委派执行器
 
-把读多写少、可独立验证的子任务委派给本地 CLI 智能体（`kimi-cli` / `codex exec`），并行执行后由主 agent 严格验收，不满意可要求重做（最多 3 次），每次任务结束输出 token 用量与节省估算报告。
+把读多写少、可独立验证的子任务委派给本地 CLI 智能体（`kimi-cli` / `codex exec` / `claude -p`），并行执行后由主 agent 严格验收，不满意可要求重做（最多 3 次），每次任务结束输出 token 用量与节省估算报告。
 
-**5 种执行模式：**
+**6 种执行模式：**
 
 | 模式 | 适用场景 |
 |------|----------|
@@ -188,14 +188,15 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 | 3. kimi 先跑 → codex 复审 | 重要审计的交叉验证（**强烈推荐**） |
 | 4. kimi + codex 并行 | 要快又要二审，两边一致 = 高置信，分歧由主 agent 亲核 |
 | 5. 主 agent 终审 + token 报告 | 可追加在任意模式之后收尾（建议每次都跑） |
+| 6. claude-only（headless） | 环境没装 kimi/codex 或需要更强模型；按 Claude 系列分级选型：fable-5（最难）→ opus-4.8（默认）→ opus-4.6（降级）→ sonnet-4.6（批量并发）→ haiku-4.5（机械任务），优先使用当前环境可用的模型 |
 
 **核心流程（7 步）：** 拆任务 → 写结构化 prompt（检查点清单 + 行号证据要求）→ 并发起飞 → 4 关验收（完整性/格式/抽查强声明/结论一致性）→ 不满意重做（追加反馈，最多 3 次）→ 主 agent 综合自核 → 输出 token 报告。
 
 **适合委派的子任务（必须全部满足）：** 只读为主、可独立完成、产出格式严格可验证、失败可重试。**不要**委派写代码、改文件、需主上下文或有审批链路的操作。
 
-**Token 报告（`token_report.py`）：** 解析 kimi session（`wire.jsonl`）与 codex 日志（`tokens used` 行），输出两种节省口径 —— 总 token 节省（通常很小甚至为负）与主 agent 节省（核心指标，通常 90%+，代表主上下文不被中间 grep/read 输出污染）。
+**Token 报告（`token_report.py`）：** 解析 kimi session（`wire.jsonl`）、codex 日志（`tokens used` 行）与 claude JSON 输出（`usage` + `total_cost_usd`），输出两种节省口径 —— 总 token 节省（通常很小甚至为负）与主 agent 节省（核心指标，通常 90%+，代表主上下文不被中间 grep/read 输出污染）。
 
-**前置依赖：** 至少安装并认证 `kimi-cli` 或 `codex` 其中之一。
+**前置依赖：** 至少安装并认证 `kimi-cli`、`codex`、`claude` 其中之一（在 Claude Code 内使用时 `claude` 天然可用）；派单前用 `which kimi-cli codex claude` 探测，优先使用当前环境有的。
 
 **触发方式：**
 ```
@@ -241,8 +242,8 @@ skills/
 │       ├── core.py
 │       └── design_system.py
 └── delegate-to-cli/
-    ├── SKILL.md                        # 委派执行器主文件（5 模式/7 步流程）
-    ├── token_report.py                 # kimi/codex token 用量与节省估算报告
+    ├── SKILL.md                        # 委派执行器主文件（6 模式/7 步流程）
+    ├── token_report.py                 # kimi/codex/claude token 用量与节省估算报告
     └── README.md                       # skill 独立说明（安装/依赖/设计理念）
 
 .claude/

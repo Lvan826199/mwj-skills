@@ -1,5 +1,11 @@
 # 更新日志
 
+## [delegate-to-cli 新增 Claude 系列模型] - 2026-07-08
+
+### 新增
+- `delegate-to-cli` 新增 Mode 6（claude-only）：通过 `claude -p` headless 模式委派子任务，按 Claude 系列模型分级选型（fable-5 最难任务 / opus-4.8 默认 / opus-4.6 降级备选 / sonnet-4.6 批量并发 / haiku-4.5 机械任务），优先使用当前环境可用的 CLI 与模型
+- `token_report.py` 新增 `--claude LABEL:JSON_PATH` 参数，解析 `claude -p --output-format json` 的 `usage` 与 `total_cost_usd`，claude 子任务一并计入 token 节省估算
+
 ## [新增 delegate-to-cli] - 2026-07-08
 
 ### 新增

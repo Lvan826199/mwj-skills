@@ -1,11 +1,11 @@
 ---
 name: delegate-to-cli
-description: 把读多写少、可独立验证的子任务委派给本地 CLI 智能体（kimi-cli / codex），并行起飞，回收后由你严格验收，不满意要它重做（最多 3 次）。支持 5 种模式：纯 kimi、纯 codex、kimi 跑+codex 复审、kimi+codex 并行、外部 sub-agent 跑完 + 主 agent 终审。每次跑完输出每个 sub-agent 的 token 用量及对比 Claude 单跑的节省比例。当用户提到"派 kimi/codex 跑"、"指挥 sub-agent"、"分发任务"、"整体巡检/审计/对账"、"再用 codex/kimi 复审一遍"时触发；当主任务可拆成 2 个以上互不依赖、读多写少的并发子任务时也应主动考虑触发。
+description: 把读多写少、可独立验证的子任务委派给本地 CLI 智能体（kimi-cli / codex / claude），并行起飞，回收后由你严格验收，不满意要它重做（最多 3 次）。支持 6 种模式：纯 kimi、纯 codex、kimi 跑+codex 复审、kimi+codex 并行、外部 sub-agent 跑完 + 主 agent 终审、纯 claude（Claude Code headless，按 fable-5/opus-4.8/opus-4.6/sonnet-4.6 分级选型，优先使用当前环境可用的 CLI 与模型）。每次跑完输出每个 sub-agent 的 token 用量及对比 Claude 单跑的节省比例。当用户提到"派 kimi/codex/claude 跑"、"指挥 sub-agent"、"分发任务"、"整体巡检/审计/对账"、"再用 codex/kimi 复审一遍"时触发；当主任务可拆成 2 个以上互不依赖、读多写少的并发子任务时也应主动考虑触发。
 ---
 
 # Delegate-to-CLI
 
-把可以独立完成、产出格式可验证的子任务**派**给本地命令行 AI（`kimi-cli` 或 `codex exec`），主 agent 留在主线做综合判断。**不要**把需要主上下文、需要写文件、或需要跨任务协调的活派出去。
+把可以独立完成、产出格式可验证的子任务**派**给本地命令行 AI（`kimi-cli`、`codex exec` 或 `claude -p`），主 agent 留在主线做综合判断。**派单前先用 `which kimi-cli codex claude` 探测环境，优先使用当前环境已安装的 CLI。****不要**把需要主上下文、需要写文件、或需要跨任务协调的活派出去。
 
 每次任务结束输出 **token 用量 + 节省估算**（见末尾 §Token Reporting）。
 
@@ -23,7 +23,7 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 - 跨子任务有数据依赖 → 不能并发，分开主 agent 做更快
 - 涉及需要审批、产生副作用、动 git/远端的操作 → 主 agent 做，留审批链路
 
-## 5 种执行模式
+## 6 种执行模式
 
 按"任务确定性 / 你对 sub-CLI 的信任度 / 时间预算"组合选择。
 
@@ -58,7 +58,24 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 2. 主 agent 抽查 4-6 条强声明（用 Read/Bash 自己核）
 3. 输出综合报告 + 调用 `token_report.py` 出 token 节省估算
 
-> 这个模式可以追加在 Mode 1/2/3/4 任意一个之后。强烈建议每次都跑 Mode 5 收尾。
+> 这个模式可以追加在 Mode 1/2/3/4/6 任意一个之后。强烈建议每次都跑 Mode 5 收尾。
+
+### Mode 6: claude-only（Claude Code headless）
+**何时用**：精确代码语义任务（行号、调用图、函数签名审计）与中文报告型任务都能胜任；**当前环境没装 kimi/codex、或任务难度需要 Claude 系列更强模型时的首选**。
+**流程**：拆任务 → 按难度选模型 → 并发派 claude → 主 agent 抽查 → 综合。
+**典型场景**：合规扫描（grep + 代码语义判断）、API 行为审计、跨模块调用一致性、跨多文档对账汇总。
+
+**模型分级选型**（优先使用当前环境已可用的模型；不确定订阅内有哪些时，先用当前会话正在使用的模型）：
+
+| 模型 | 模型 ID | 何时用 |
+|---|---|---|
+| Fable 5 | `claude-fable-5` | 最难的长程审计、交叉验证终审；能力最强、单价最高，只派给最关键的子任务 |
+| Opus 4.8 | `claude-opus-4-8` | **默认选择**：代码语义强、行号精准，重要审计子任务 |
+| Opus 4.6 | `claude-opus-4-6` | Opus 4.8 不可用时的降级备选 |
+| Sonnet 4.6 | `claude-sonnet-4-6` | 速度/成本平衡，大批量并发子任务的默认档 |
+| Haiku 4.5 | `claude-haiku-4-5` | 机械型 grep/清单/格式核对任务 |
+
+> 与 Mode 3/4 组合时，claude 可以顶替 kimi 或 codex 的位置（如 sonnet-4.6 跑第一轮 + opus-4.8 复审）。
 
 ## 适合派给 sub-CLI 的子任务特征（必须全部满足）
 
@@ -75,7 +92,7 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 | 默认 | 中文报告 / 文档对账 / 探索性问题 | 代码语义检查 / 行号级证据 / cross-check |
 | Token 计费 | input_other + cache_read 拆开计 | 只给一个聚合 `tokens used`，区分粒度低 |
 
-不确定时默认用 kimi（cache 友好），结果可疑用 Mode 3 跑 codex cross-check。
+不确定时默认用 kimi（cache 友好），结果可疑用 Mode 3 跑 codex cross-check。**环境里没有 kimi/codex，或子任务难度超出两者能力时，走 Mode 6 用 claude（按模型分级表选档）。**
 
 ## 调用模板
 
@@ -102,6 +119,22 @@ cat /tmp/<session>/prompt_X.txt | codex exec \
 ```
 
 `-o` = 最终消息写到文件；stdin 传 prompt 避免 shell 长度限制；**`log_X.txt` 包含 `tokens used` 行**，token 报告会从这里解析。
+
+### claude -p（Claude Code headless）
+
+```bash
+cd <PROJECT_ROOT> && claude -p "$(cat /tmp/<session>/prompt_X.txt)" \
+  --model claude-opus-4-8 \
+  --dangerously-skip-permissions \
+  --output-format json \
+  > /tmp/<session>/out_X.json 2> /tmp/<session>/err_X.log
+```
+
+`-p` = 非交互；`--model` = 按 Mode 6 分级表选档（默认 `claude-opus-4-8`，批量并发用 `claude-sonnet-4-6`）；`--dangerously-skip-permissions` = 自动批准（只对只读任务）；`--output-format json` = 输出 JSON，**`result` 字段是最终消息，`usage` 字段含 token 用量**，token 报告直接从这个 JSON 解析。取最终消息：
+
+```bash
+jq -r .result /tmp/<session>/out_X.json > /tmp/<session>/out_X.md
+```
 
 ## 执行流程（每次都按这个走）
 
@@ -161,6 +194,7 @@ cat /tmp/<session>/prompt_X.txt | codex exec \
 - `/tmp/<session-name>/out_<X>.md` — 子任务最终消息（kimi 用 `--quiet > out_X.md`；codex 用 `-o out_X.md`）
 - `/tmp/<session-name>/err_<X>.log` — kimi 的 stderr（含 session id）
 - `/tmp/<session-name>/log_<X>.txt` — codex 的 stdout（含 `tokens used`）
+- `/tmp/<session-name>/out_<X>.json` — claude 的 JSON 输出（含 `result` 与 `usage`，`jq -r .result` 提取正文）
 
 ### 收集 session id / log path
 
@@ -171,12 +205,15 @@ grep "kimi -r" /tmp/<session>/err_A.log | awk '{print $NF}'
 
 **codex**：日志路径就是 `log_<X>.txt`，`token_report.py` 自己从里面提 `tokens used` 行。
 
+**claude**：路径就是 `out_<X>.json`，`token_report.py` 从里面提 `usage`（input/cache_read/output）和 `total_cost_usd`。
+
 ### 跑报告
 
 ```bash
 python3 ~/.claude/skills/delegate-to-cli/token_report.py \
   --kimi A:<sid_A> B:<sid_B> ... \
   --codex A:/tmp/<session>/log_A.txt B:/tmp/<session>/log_B.txt ... \
+  --claude A:/tmp/<session>/out_A.json B:/tmp/<session>/out_B.json ... \
   --claude-overhead 80000 \
   --out /tmp/<session>/token_report.md
 ```
@@ -186,7 +223,7 @@ python3 ~/.claude/skills/delegate-to-cli/token_report.py \
 ### 报告内容（自动生成）
 
 - **每个 sub-CLI 子任务**：input_other / cache_read / output / grand 各一行
-- **小计**：kimi 总和、codex 总和
+- **小计**：kimi 总和、codex 总和、claude 总和
 - **委派总成本**：sub-CLI 总和 + Claude 主 agent 协调开销
 - **Claude 单跑预估范围**：
   - 下限 = 等量 grep/read 的 token（≈ 委派总量）
@@ -291,4 +328,14 @@ python3 ~/.claude/skills/delegate-to-cli/token_report.py \
 - 位置参数 / stdin 传 prompt
 - session 数据：`~/.codex/sessions/<year>/<month>/<day>/rollout-*.jsonl`
 
-两者都通过环境变量 `HTTP_PROXY/HTTPS_PROXY` 走代理（codex 通常已 alias 好）。
+### claude -p
+- `-p` / `--print` 非交互（必带）
+- `--model <id>` 指定模型（`claude-fable-5` / `claude-opus-4-8` / `claude-opus-4-6` / `claude-sonnet-4-6` / `claude-haiku-4-5`，按 Mode 6 分级表选）
+- `--dangerously-skip-permissions` 自动批准（只对只读任务）
+- `--output-format json` 结构化输出（`result` 正文 + `usage` token 用量 + `total_cost_usd`）
+- `--allowedTools <tools...>` 更保守的替代方案：只放行 `Read Grep Glob Bash`，不跳过权限
+- `--add-dir <dir>` 额外授权目录（默认只能访问启动目录）
+- `--append-system-prompt "<text>"` 追加系统提示（如"你是审计员，只读不写"）
+- `--fallback-model <id>` 主模型过载时自动降级
+
+三者都通过环境变量 `HTTP_PROXY/HTTPS_PROXY` 走代理（codex 通常已 alias 好）。

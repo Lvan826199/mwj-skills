@@ -1,6 +1,6 @@
 # delegate-to-cli
 
-A Claude Code Skill for **delegating read-heavy, independently-verifiable subtasks** to local CLI agents (`kimi-cli` or `codex exec`), running them in parallel, then rigorously verifying the results in the main session.
+A Claude Code Skill for **delegating read-heavy, independently-verifiable subtasks** to local CLI agents (`kimi-cli`, `codex exec`, or `claude -p`), running them in parallel, then rigorously verifying the results in the main session.
 
 > Use this when the main agent shouldn't blow its context window doing 4 parallel grep-heavy audits by itself.
 
@@ -12,7 +12,7 @@ A Claude Code Skill for **delegating read-heavy, independently-verifiable subtas
 - **Retries** unsatisfactory subtasks up to 3 times (with appended feedback), then falls back to the main agent
 - **Reports** per-agent token usage and estimates how much main-agent token bandwidth was saved
 
-## 5 execution modes
+## 6 execution modes
 
 | Mode | When to use |
 |---|---|
@@ -21,6 +21,7 @@ A Claude Code Skill for **delegating read-heavy, independently-verifiable subtas
 | **3. kimi first → codex cross-check** | High-stakes audits; want fast first pass + rigorous second pass (recommended) |
 | **4. kimi + codex parallel → main agent synthesizes** | Want both views simultaneously; main agent reconciles disagreements |
 | **5. After sub-agents finish → main agent final verification + token report** | Add this on top of any other mode for closing rigor + saved-token measurement |
+| **6. claude-only (Claude Code headless)** | kimi/codex not installed, or the subtask needs a stronger model — tiered model selection: `claude-fable-5` (hardest), `claude-opus-4-8` (default), `claude-opus-4-6` (fallback), `claude-sonnet-4-6` (bulk parallel), `claude-haiku-4-5` (mechanical). Prefer models available in the current environment. |
 
 ## Files
 
@@ -54,7 +55,7 @@ Claude Code auto-discovers skills on session start. Triggers when the user menti
 
 ## Prerequisites
 
-You need at least one of these CLIs installed and authenticated:
+You need at least one of these CLIs installed and authenticated (probe with `which kimi-cli codex claude` and prefer what's available):
 
 ### kimi-cli
 
@@ -78,6 +79,16 @@ echo "say hello in one word" | codex exec \
 ```
 
 The skill uses `exec`, `--dangerously-bypass-approvals-and-sandbox`, and `-o <file>` to capture the final message.
+
+### claude (Claude Code headless — Mode 6)
+
+Already installed if you're running this skill inside Claude Code. Test:
+
+```bash
+claude -p "say hello in one word" --output-format json
+```
+
+The skill uses `-p --dangerously-skip-permissions --output-format json`; the JSON carries the final message (`result`), token usage (`usage`), and `total_cost_usd` — parsed directly by `token_report.py` via `--claude LABEL:/path/out.json`.
 
 ## How the token report works
 
@@ -117,6 +128,7 @@ Output (example, real numbers from one inspection run):
 
 - **kimi**: `~/.kimi/sessions/<hash>/<session-id>/wire.jsonl` contains a `token_usage` field per turn with `input_other`, `input_cache_read`, `input_cache_creation`, `output`. The skill grabs the session ID from kimi's stderr (`To resume this session: kimi -r <SID>`).
 - **codex**: stdout contains a `tokens used\n<number>` block; `token_report.py` regex-parses it.
+- **claude**: `--output-format json` emits a single JSON object with `usage` (input / cache_read / cache_creation / output) and `total_cost_usd`; `token_report.py` reads it directly.
 
 ## Skill design philosophy
 

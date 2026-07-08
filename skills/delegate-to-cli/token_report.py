@@ -89,9 +89,36 @@ def parse_codex_log(log_path: str) -> dict[str, Any]:
     return {"grand": int(m.group(1).replace(",", "")), "log_path": str(p)}
 
 
+def parse_claude_json(json_path: str) -> dict[str, Any]:
+    """Parse `claude -p --output-format json` output (Mode 6)."""
+    p = Path(json_path)
+    if not p.exists():
+        return {"error": f"json not found: {json_path}"}
+    try:
+        obj = json.loads(p.read_text(errors="replace"))
+    except Exception as exc:
+        return {"error": f"invalid json in {json_path}: {exc}"}
+    usage = obj.get("usage")
+    if not isinstance(usage, dict):
+        return {"error": f"no `usage` field in {json_path}"}
+    totals: dict[str, Any] = {
+        "input_other": int(usage.get("input_tokens") or 0),
+        "input_cache_read": int(usage.get("cache_read_input_tokens") or 0),
+        "input_cache_creation": int(usage.get("cache_creation_input_tokens") or 0),
+        "output": int(usage.get("output_tokens") or 0),
+    }
+    totals["sum_input"] = (
+        totals["input_other"] + totals["input_cache_read"] + totals["input_cache_creation"]
+    )
+    totals["grand"] = totals["sum_input"] + totals["output"]
+    totals["cost_usd"] = obj.get("total_cost_usd")
+    return totals
+
+
 def render_report(
     kimi_results: dict[str, dict],
     codex_results: dict[str, dict],
+    claude_results: dict[str, dict],
     claude_overhead: int,
 ) -> str:
     lines: list[str] = ["# Token Usage Report", ""]
@@ -130,7 +157,26 @@ def render_report(
         lines.append(f"| **小计** | **{codex_total:,}** |")
         lines.append("")
 
-    delegated = kimi_total + codex_total
+    claude_total = 0
+    if claude_results:
+        lines.append("## claude sessions（Mode 6）")
+        lines.append("")
+        lines.append("| 任务 | input | cache_read | output | grand | cost(USD) |")
+        lines.append("|---|---:|---:|---:|---:|---:|")
+        for label, r in claude_results.items():
+            if "error" in r:
+                lines.append(f"| {label} | — | — | — | _{r['error']}_ | — |")
+                continue
+            claude_total += r["grand"]
+            cost = f"{r['cost_usd']:.4f}" if isinstance(r.get("cost_usd"), (int, float)) else "—"
+            lines.append(
+                f"| {label} | {r['input_other']:,} | {r['input_cache_read']:,} "
+                f"| {r['output']:,} | **{r['grand']:,}** | {cost} |"
+            )
+        lines.append(f"| **小计** | | | | **{claude_total:,}** | |")
+        lines.append("")
+
+    delegated = kimi_total + codex_total + claude_total
     coordinated_actual = delegated + claude_overhead
 
     lines.extend(
@@ -151,7 +197,11 @@ def render_report(
         # 上限模型：Claude 主上下文累积，相比 sub-CLI 多 N×overhead 的反复传入
         n_tasks = sum(
             1
-            for r in list(kimi_results.values()) + list(codex_results.values())
+            for r in (
+                list(kimi_results.values())
+                + list(codex_results.values())
+                + list(claude_results.values())
+            )
             if "error" not in r
         )
         solo_lower = delegated
@@ -212,6 +262,13 @@ def main() -> None:
         help="codex log entries, e.g. A:/tmp/log_A.txt",
     )
     parser.add_argument(
+        "--claude",
+        nargs="*",
+        default=[],
+        metavar="LABEL:JSON_PATH",
+        help="claude -p --output-format json entries, e.g. A:/tmp/out_A.json",
+    )
+    parser.add_argument(
         "--claude-overhead",
         type=int,
         default=50000,
@@ -220,8 +277,8 @@ def main() -> None:
     parser.add_argument("--out", help="write report to file (default: stdout)")
     args = parser.parse_args()
 
-    if not args.kimi and not args.codex:
-        parser.error("at least one of --kimi or --codex required")
+    if not args.kimi and not args.codex and not args.claude:
+        parser.error("at least one of --kimi, --codex or --claude required")
 
     kimi_results = {}
     for spec in args.kimi:
@@ -239,7 +296,17 @@ def main() -> None:
             continue
         codex_results[label] = parse_codex_log(log)
 
-    report = render_report(kimi_results, codex_results, args.claude_overhead)
+    claude_results = {}
+    for spec in args.claude:
+        label, sep, json_path = spec.partition(":")
+        if not sep:
+            print(f"skipping malformed --claude entry: {spec!r}", file=sys.stderr)
+            continue
+        claude_results[label] = parse_claude_json(json_path)
+
+    report = render_report(
+        kimi_results, codex_results, claude_results, args.claude_overhead
+    )
 
     if args.out:
         Path(args.out).write_text(report)

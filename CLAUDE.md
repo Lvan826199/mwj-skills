@@ -25,7 +25,7 @@
 | `req-doc-generator` | `/req-doc-generator` | 三阶段需求/数据库/API 文档生成 |
 | `mwj-design-system` | `/mwj-design-system` | MWJ Design System v1.2 前端规范执行器 |
 | `ui-ux-pro-max-new` | `/ui-ux-pro-max-new` | UI/UX 设计智能助手（67 风格/96 配色/13 技术栈） |
-| `delegate-to-cli` | `/delegate-to-cli` 或提到"派 kimi/codex 跑"、"整体巡检/审计" | 将读多写少的子任务委派给本地 CLI 智能体（kimi-cli/codex），并行执行、严格验收并输出 token 节省报告 |
+| `delegate-to-cli` | `/delegate-to-cli` 或提到"派 kimi/codex/claude 跑"、"整体巡检/审计" | 将读多写少的子任务委派给本地 CLI 智能体（kimi-cli/codex/claude），并行执行、严格验收并输出 token 节省报告 |
 
 ---
 
