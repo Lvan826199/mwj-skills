@@ -1,6 +1,6 @@
 # mwj-skills
 
-梦无矶 Claude Code 个人 Skills 集合，包含代码审查、需求文档生成、前端设计规范执行等自动化工作流。
+梦无矶 Claude Code 个人 Skills 集合，包含代码审查、需求文档生成、前端设计规范执行、子任务委派等自动化工作流。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -175,6 +175,36 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 
 ---
 
+### `/delegate-to-cli` — 子任务委派执行器
+
+把读多写少、可独立验证的子任务委派给本地 CLI 智能体（`kimi-cli` / `codex exec`），并行执行后由主 agent 严格验收，不满意可要求重做（最多 3 次），每次任务结束输出 token 用量与节省估算报告。
+
+**5 种执行模式：**
+
+| 模式 | 适用场景 |
+|------|----------|
+| 1. kimi-only | 中文长文档审计、跨多文档对账，任务难度中低、信任度足够 |
+| 2. codex-only | 精确代码语义任务（行号、调用图、函数签名审计） |
+| 3. kimi 先跑 → codex 复审 | 重要审计的交叉验证（**强烈推荐**） |
+| 4. kimi + codex 并行 | 要快又要二审，两边一致 = 高置信，分歧由主 agent 亲核 |
+| 5. 主 agent 终审 + token 报告 | 可追加在任意模式之后收尾（建议每次都跑） |
+
+**核心流程（7 步）：** 拆任务 → 写结构化 prompt（检查点清单 + 行号证据要求）→ 并发起飞 → 4 关验收（完整性/格式/抽查强声明/结论一致性）→ 不满意重做（追加反馈，最多 3 次）→ 主 agent 综合自核 → 输出 token 报告。
+
+**适合委派的子任务（必须全部满足）：** 只读为主、可独立完成、产出格式严格可验证、失败可重试。**不要**委派写代码、改文件、需主上下文或有审批链路的操作。
+
+**Token 报告（`token_report.py`）：** 解析 kimi session（`wire.jsonl`）与 codex 日志（`tokens used` 行），输出两种节省口径 —— 总 token 节省（通常很小甚至为负）与主 agent 节省（核心指标，通常 90%+，代表主上下文不被中间 grep/read 输出污染）。
+
+**前置依赖：** 至少安装并认证 `kimi-cli` 或 `codex` 其中之一。
+
+**触发方式：**
+```
+/delegate-to-cli
+```
+或说"派 kimi/codex 跑"、"指挥 sub-agent"、"分发任务"、"整体巡检/审计/对账"、"再用 codex/kimi 复审一遍"。
+
+---
+
 ## 目录结构
 
 ```
@@ -197,19 +227,23 @@ skills/
 │   ├── SKILL.md                        # MWJ Design System v1.2 执行规范
 │   └── references/
 │       └── migration-guide.md          # SCSS → CSS Token 迁移实战规则
-└── ui-ux-pro-max-new/
-    ├── SKILL.md                        # 设计智能助手主文件
-    ├── data/                           # 设计数据库（配色/图表/风格/排版等 CSV）
-    │   ├── colors.csv
-    │   ├── charts.csv
-    │   ├── styles.csv
-    │   ├── typography.csv
-    │   ├── ux-guidelines.csv
-    │   └── stacks/                     # 各技术栈最佳实践
-    └── scripts/                        # Python 搜索脚本
-        ├── search.py
-        ├── core.py
-        └── design_system.py
+├── ui-ux-pro-max-new/
+│   ├── SKILL.md                        # 设计智能助手主文件
+│   ├── data/                           # 设计数据库（配色/图表/风格/排版等 CSV）
+│   │   ├── colors.csv
+│   │   ├── charts.csv
+│   │   ├── styles.csv
+│   │   ├── typography.csv
+│   │   ├── ux-guidelines.csv
+│   │   └── stacks/                     # 各技术栈最佳实践
+│   └── scripts/                        # Python 搜索脚本
+│       ├── search.py
+│       ├── core.py
+│       └── design_system.py
+└── delegate-to-cli/
+    ├── SKILL.md                        # 委派执行器主文件（5 模式/7 步流程）
+    ├── token_report.py                 # kimi/codex token 用量与节省估算报告
+    └── README.md                       # skill 独立说明（安装/依赖/设计理念）
 
 .claude/
 ├── settings.json                       # 项目级 hook 配置

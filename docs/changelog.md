@@ -1,5 +1,11 @@
 # 更新日志
 
+## [新增 delegate-to-cli] - 2026-07-08
+
+### 新增
+- 新增 `delegate-to-cli` skill：把读多写少、可独立验证的子任务委派给本地 CLI 智能体（kimi-cli / codex exec），支持 5 种执行模式（纯 kimi / 纯 codex / kimi 跑 + codex 复审 / 双 CLI 并行 / 主 agent 终审），4 关验收 + 最多 3 次重做
+- 新增 `token_report.py`：解析 kimi session（wire.jsonl）与 codex 日志，生成 token 用量报告，输出"总 token 节省"与"主 agent 节省"两种口径的估算
+
 ## [skills 全面优化] - 2026-06-10
 
 ### 新增
