@@ -2,6 +2,9 @@
 
 ## [mwj-design-system v2.0] - 2026-10-30
 
+### 修复
+- `py-code-review/references/mwj-conventions.md` 删掉公开仓库里不应出现的具体项目配置细节，改为通用表述
+
 ### 新增
 - `mwj-design-system` 新增「适用范围」：每个项目可以有自己的风格（用户 2026-10-30 定），先探测项目是否采用 MWJ，独立风格项目不强制套用
 - 新增「标准 / 柔和」双变体：柔和变体收编 MoneyFree / MwjZhiWen / MwjAppPrefTrace 的取值（`#EEF2F8`、`--radius-lg` 20px、允许深色侧栏）

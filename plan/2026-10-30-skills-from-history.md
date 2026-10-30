@@ -1,6 +1,6 @@
 # 从历史会话与项目反哺 Skill 方案（2026-10-30）
 
-> 状态：**第一、二批已完成**（2026-10-30）；第三批（B1 / C2 / F）与 D 组待启动。
+> 状态：**第一、二、三批已完成**（2026-10-30）；D 组暂缓；用户级软链接与项目副本同步暂缓。
 > 调研范围：MyProject 下 12 个项目的代码与文档、约 160 条记忆、约 60 个历史会话（去重后 776 条用户原话）。
 
 ## 一、调研结论（依据）
@@ -149,4 +149,4 @@
 - [x] F4 评估只在项目里有的 skill（design-system 的两份 reference 已收回；agent-rules-single-source 已并入 B1；msca-handoff 已由 device-handoff 覆盖，保留在 MSCA 项目内；mwj-autonomous-ui-skill-v3 与 ui-selfcheck 定位不同，暂留在项目内）：msca-handoff 已由 device-handoff 覆盖；agent-rules-single-source 并入 B1；mwj-autonomous-ui-skill-v3 和 design-system 多出的 reference 并入 C2
 - [x] B1 mwj-project-init（AGENTS.md 为源；在 scratchpad 生成 mwj-demo 实跑门禁全绿）
 - [x] C2 mwj-design-system v2.0（用户定：收编柔和变体、暂不做暗色、各项目可有自己风格；原计划的 core/实现层拆分改为不拆——需求已由适用范围 + 变体一节满足，避免大改 646 行引入回归）
-- [ ] D1–D3 领域 skill
+- [ ] D1–D3 领域 skill：用户 2026-10-30 决定这一轮不做。注意 mwj-skills 是公开仓库，以后要做时，先定好哪些内容放进项目内、不公开
