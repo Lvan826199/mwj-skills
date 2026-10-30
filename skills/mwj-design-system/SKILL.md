@@ -1,11 +1,24 @@
 ---
 name: mwj-design-system
-description: MWJ Design System 前端开发规范执行器 v1.2。当用户需要开发、重构、创建前端页面、Vue 组件、UI 界面、前端样式时，必须使用此 skill 确保所有输出严格遵循 MWJ 设计系统。触发场景包括：用户说"写个页面"、"创建组件"、"重构前端"、"实现 UI"、"设计样式"、"写前端代码"、"开发视图"、"做个表单/表格/卡片/按钮/菜单/导航"、提到 MWJ 设计规范、提到前端重构、要求实现任何 Vue/TypeScript/TailwindCSS 相关的界面代码、涉及测试平台业务组件（用例卡片/缺陷面板/报告看板/AI 对话）。即使用户没有明确提到"设计规范"，只要涉及本项目的前端 UI 开发，都应触发此 skill。
+description: MWJ Design System v2.0 前端规范执行器（白蓝极简 SaaS 风格，含「标准」与「柔和」两个变体）。适用于已采用 MWJ 风格的项目（AiTestProject、game-auto 为标准变体；MoneyFree、MwjZhiWen、MwjAppPrefTrace 为柔和变体）或用户明确要求用 MWJ 风格时：写页面、组件、表单、表格、卡片、菜单、样式，或重构这些项目的前端。项目有自己的风格（如 Sujian、AutoAppAgent、MSCA）时不强制套用，以项目现有风格为准。
 ---
 
-# MWJ Design System v1.2 — 前端开发执行规范
+# MWJ Design System v2.0 — 前端开发执行规范
 
-本 skill 确保所有前端代码输出严格遵循 Mwj 一体化测试平台设计系统 v1.2。
+本 skill 让采用 MWJ 风格的项目，前端输出遵循 MWJ 设计系统。
+
+## 适用范围（v2.0 新增，先判断再执行）
+
+**每个项目都可以有自己的风格，这套规范不是定死的。**（用户 2026-10-30 定）
+
+1. **先看项目现在用的是什么风格**：
+   ```bash
+   grep -rlE "#1677FF|--color-primary|components/mwj|Mwj[A-Z]" --include=*.{ts,js,vue,scss,css,html} . 2>/dev/null | grep -v node_modules | head
+   ```
+   - 命中 MWJ Token 或 `Mwj*` 组件 → 本规范适用，接着第 2 步选变体。
+   - 项目有自己的一套风格（例如 Sujian 暖纸色、AutoAppAgent 青绿暗色、MSCA 的 Element 暗色主题）→ **以项目现有风格为准，不套用本规范**；只在用户需要时，借用下文与风格无关的部分（数据状态、可访问性、交付自检）。
+   - 新项目 → 问用户：用 MWJ（哪个变体），还是另定风格。
+2. **选变体**：沿用项目已有的 Token 值，见下文「变体」一节；新项目按场景选。
 
 **规范文档位置：** 目标项目中的 `MWJ_Design_System.md`（18 章完整规范，通常位于项目根目录或 `doc/` 目录；缺失时见 Step 1 降级策略）
 
@@ -99,6 +112,34 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 
 ---
 
+## 变体（v2.0）
+
+两套变体只在下面几项不同，其余 Token、组件、布局全部共用。
+
+| Token / 元素 | 标准变体（后台平台类） | 柔和变体（桌面 / 工具类） |
+|---|---|---|
+| `--bg-page` | `#F5F7FB` | `#EEF2F8` |
+| `--radius-lg`（弹窗、Drawer、大容器） | `16px` | `20px` |
+| 侧栏 | 浅色（白底 + 浅蓝选中） | 允许深色侧栏（如 MoneyFree `#13233D`），选中项用主色浅底 |
+| 适用 | 测试平台、企业后台（AiTestProject、game-auto） | 桌面应用、个人工具、报告页（MoneyFree、MwjZhiWen、MwjAppPrefTrace） |
+
+- 判断项目用的是哪个变体：看 `--bg-page` 和 `--radius-lg` 的现值，**照现值写，不要顺手统一**。
+- 柔和变体已经落地的参照：`references/homepage-style-guide.md`（MwjAppPrefTrace 首页实际生效的样式）。
+- 两个变体都禁止硬编码色值；深色侧栏的颜色也要定义成 Token（例如 `--bg-sidebar`），不能在组件里直接写死。
+
+---
+
+## 下拉框组件
+
+所有自定义下拉框必须先阅读并遵守 `references/select-dropdown-spec.md`。该规格统一了以下内容：
+- 触发器尺寸、箭头几何形状
+- 菜单滚动、状态反馈
+- 键盘交互、ARIA 语义
+
+其中的 MWJ Token 约束优先于项目局部样式。
+
+---
+
 ## SCSS → CSS Token 迁移（旧页面重构）
 
 执行旧页面重构 / SCSS 变量迁移任务时，**必须先读取 `references/migration-guide.md`** 再动手。该文档包含：
@@ -125,7 +166,7 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 
 ---
 
-## Design Token 速查（v1.2 完整版）
+## Design Token 速查（v2.0，标准变体取值；柔和变体差异见「变体」一节）
 
 ### 颜色
 
@@ -144,7 +185,9 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 --color-success-bg: #DCFCE7;
 
 --color-warning: #F59E0B;
+--color-warning-bg: #FEF3C7;
 --color-danger: #EF4444;
+--color-danger-bg: #FEE2E2;
 --color-info: #0EA5E9;
 
 /* 中性色阶（Slate 10 阶） */
@@ -160,7 +203,7 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 --gray-900: #0F172A;
 
 /* 背景与文本（语义层） */
---bg-page: #F5F7FB;
+--bg-page: #F5F7FB;   /* 柔和变体 #EEF2F8 */
 --bg-card: #FFFFFF;
 --bg-mask: rgba(15,23,42,0.45);
 --text-primary: #0F172A;
@@ -215,7 +258,7 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 ```css
 --radius-sm: 8px;    /* Tag、小按钮、Input */
 --radius-md: 12px;   /* 默认按钮、Select */
---radius-lg: 16px;   /* 弹窗、Drawer */
+--radius-lg: 16px;   /* 弹窗、Drawer；柔和变体 20px（含大容器） */
 --radius-xl: 24px;   /* 卡片、容器 */
 --radius-full: 9999px; /* 头像、Pill 标签 */
 ```
@@ -223,7 +266,7 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 **元素圆角推荐对照：**
 - Button / Input → `8px`（--radius-sm）
 - Select / Dropdown → `12px`（--radius-md）
-- Modal / Drawer → `16px`（--radius-lg）
+- Modal / Drawer → `16px`（--radius-lg；柔和变体 20px）
 - Card / 大容器 / 看板卡 → `24px`（--radius-xl）
 - Pill Tag / Avatar → `9999px`（--radius-full）
 
@@ -502,7 +545,7 @@ module.exports = {
         success: '#22C55E',
         warning: '#F59E0B',
         danger: '#EF4444',
-        'bg-page': '#F5F7FB',
+        'bg-page': '#F5F7FB', // 柔和变体 '#EEF2F8'
         'text-primary': '#0F172A',
         'border-base': '#E2E8F0',
         // ... 其他 Token
@@ -638,9 +681,9 @@ Token（设计令牌） → Component（组件系统） → Page（页面装配�
 - ✅ 所有 AI 输出必须可控（停止 / 重生 / 反馈）
 - ❌ 禁止单页定制 UI
 - ❌ 禁止硬编码色值、间距、字号
-- ❌ 禁止多套 UI 风格混用
+- ❌ 禁止在**同一个项目里**混用多套 UI 风格（不同项目之间可以有各自的风格）
 
 ---
 
-> 本规范基于 MWJ_Design_System.md v1.2（18 章完整规范），所有页面与组件开发必须严格遵循。
+> 本规范基于 MWJ_Design_System.md v1.2（18 章完整规范），v2.0 新增了适用范围、柔和变体和下拉框规格。采用 MWJ 风格的项目，页面与组件开发都必须遵循本规范。
 
