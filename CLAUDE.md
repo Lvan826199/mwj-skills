@@ -26,6 +26,9 @@
 | `mwj-design-system` | `/mwj-design-system` | MWJ Design System v1.2 前端规范执行器 |
 | `ui-ux-pro-max-new` | `/ui-ux-pro-max-new` | UI/UX 设计智能助手（67 风格/96 配色/13 技术栈） |
 | `delegate-to-cli` | `/delegate-to-cli` 或提到"派 kimi/codex/claude 跑"、"整体巡检/审计" | 将读多写少的子任务委派给本地 CLI 智能体（kimi-cli/codex/claude），并行执行、严格验收并输出 token 节省报告 |
+| `device-handoff` | `/device-handoff` 或说"给 Windows 提示词"、"回执来了"、"按联调任务执行" | 跨机器真机联调闭环：Linux 侧下发自检/任务单/回执审批/复验，Windows 侧照单执行并写回执 |
+| `postmortem` | `/postmortem` 或说"写归因"、"复盘"；修完 bug 主动触发 | 收工归因，三档粒度（表格行/条目/独立文档），根因按证据分级 |
+| `release-ship` | `/release-ship` 或说"发版"、"出 vX.Y.Z"、"打 tag" | 发版流程：版本号确认（只升末位）、门禁、版本号全量同步、CHANGELOG、标签、Windows 打包验收、发布逐项确认 |
 
 ---
 

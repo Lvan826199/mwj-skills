@@ -1,5 +1,13 @@
 # 更新日志
 
+## [从历史会话反哺第一批 skill] - 2026-10-30
+
+### 新增
+- 新增 `device-handoff` skill：跨机器真机联调闭环，一个 skill 双角色（Linux 下发侧 / Windows 执行侧），含任务单与复验提示词骨架、回执骨架、下发前自检清单、回执审批清单、联调协议 README 模板；提炼自 MSCA、MoneyFree、iPhoneUsbTouch、AiTestProject 的联调实践
+- 新增 `postmortem` skill：收工归因，按问题大小选表格行 / 条目 / 独立文档三档，根因按证据分级，收工主动交付
+- 新增 `release-ship` skill：发版流程，版本号默认只升末位并先确认、版本号位置全量同步、CHANGELOG 转版本、附注标签、Windows 打包验收交给 device-handoff、对外发布逐项确认
+- 新增 `plan/2026-10-30-skills-from-history.md`：从 12 个项目、约 160 条记忆、约 60 个历史会话提炼的完整 skill 方案（A–F 组）与施工顺序
+
 ## [delegate-to-cli 新增 Claude 系列模型] - 2026-07-08
 
 ### 新增

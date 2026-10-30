@@ -206,6 +206,49 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 
 ---
 
+### `/device-handoff` — 跨机器真机联调闭环
+
+Linux 开发机写代码 ⇄ Windows 真机侧 Codex/Claude 执行并写回执。一个 skill 两个角色，按平台和用户说法自动判断。
+
+| 角色 | 职责 |
+|------|------|
+| Linux 下发侧 | 下发前自检（一轮一个问题、判据回代码核对、agent 不碰桌面、不重复已验项）→ 生成可整段复制的任务单/提示词 → 收回执先核新鲜度（日期/commit/产物时间/版本号）再逐项判定 → 写审批 → 生成只含未过项的复验提示词 → 多轮问题解决后调用 `postmortem` |
+| Windows 执行侧 | 拉代码 → 核对 commit → 照单执行 → 按骨架写回执（日志原样、数字具体）→ 只提交回执 → 一句话汇报 |
+
+**交换方式：** 优先沿用项目已有协议（如 `doc/联调/`、`docs/回执/`）；没有时可选仓库协议（自动建 `docs/联调/`）、对话粘贴、共享盘。凭据只从本机配置读取。
+
+**触发方式：** `/device-handoff`，或说"给 Windows 提示词"、"回执来了"、"审批回执"、"出复验提示词"、"按联调任务执行"、"写回执"。
+
+---
+
+### `/postmortem` — 收工归因
+
+问题修好后写归因，收工那一轮主动交付，不等用户问。
+
+| 粒度 | 适用 | 位置 |
+|------|------|------|
+| 表格行 | 单个 bug，一轮修好 | 归因表：现象 \| 根因 \| 修法 \| 防复发 |
+| 条目 | 需要记录状态的修复日志 | 现象 → 根因 → 修法 → 验证 → 状态 |
+| 独立文档 | 跨多轮、用户可感知的事故 | `docs/归因/YYYY-MM-DD-<主题>.md` |
+
+**硬规则：** 现象用原话；根因按证据分级（已确认 / 高度可能 / 未证实）并附证据；写"为什么"；教训写成可迁移的规则；与修复同一提交，同步 CHANGELOG 和跟踪文档。
+
+**触发方式：** `/postmortem`，或说"写归因"、"复盘"、"以后不能再犯"；修完 bug、多轮问题确认解决时主动触发。
+
+---
+
+### `/release-ship` — 发版
+
+Linux 定版 → Windows 打包验收 → 审批 → 正式发布。
+
+**流程：** 读项目发版规矩 → 确认版本号（默认只升末位，用选项确认，不跳号）→ 门禁（工作区干净、测试与 lint 全绿）→ `git grep` 找全版本号位置一次改完 → CHANGELOG「未发布」转版本 → `chore(release)` + 附注标签 + 推送 → Windows 产物交给 `device-handoff` 生成打包验收提示词 → 审批后合并主分支、发 Release 等对外动作逐项确认。
+
+**约束：** 只打用户这一轮要求的产物（没说不打 APK）；产物不进仓库；禁止 `git add .`。
+
+**触发方式：** `/release-ship`，或说"发版"、"定版"、"出 vX.Y.Z"、"打 tag"、"发布 Release"。
+
+---
+
 ## 目录结构
 
 ```
@@ -241,10 +284,27 @@ skills/
 │       ├── search.py
 │       ├── core.py
 │       └── design_system.py
-└── delegate-to-cli/
-    ├── SKILL.md                        # 委派执行器主文件（6 模式/7 步流程）
-    ├── token_report.py                 # kimi/codex/claude token 用量与节省估算报告
-    └── README.md                       # skill 独立说明（安装/依赖/设计理念）
+├── delegate-to-cli/
+│   ├── SKILL.md                        # 委派执行器主文件（6 模式/7 步流程）
+│   ├── token_report.py                 # kimi/codex/claude token 用量与节省估算报告
+│   └── README.md                       # skill 独立说明（安装/依赖/设计理念）
+├── device-handoff/
+│   ├── SKILL.md                        # 跨机器真机联调（双角色）
+│   └── references/
+│       ├── prompt-template.md          # 任务单 / 提示词 / 复验提示词骨架
+│       ├── receipt-template.md         # 回执骨架 + 简版回执 + 审批段
+│       ├── dispatch-checklist.md       # Linux 侧下发前自检清单
+│       ├── review-checklist.md         # 回执审批清单
+│       └── protocol-readme-template.md # 新项目联调协议 README 模板
+├── postmortem/
+│   ├── SKILL.md                        # 收工归因（三档粒度）
+│   └── references/
+│       └── templates.md                # 表格行 / 条目 / 独立归因文档模板
+└── release-ship/
+    ├── SKILL.md                        # 发版流程
+    └── references/
+        ├── version-locations.md        # 各技术栈版本号位置与规则
+        └── windows-build-prompt.md     # Windows 打包验收提示词骨架
 
 .claude/
 ├── settings.json                       # 项目级 hook 配置
