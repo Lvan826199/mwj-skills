@@ -12,14 +12,18 @@
 
 Python 代码审查流程，结合工具检查与资深工程师视角的深度审查。审查优先：先报告，经用户确认后再修复。
 
+**工具链自动探测（按优先级）：** 项目门禁脚本或项目规定的命令（如只用 pyflakes）→ Ruff → Flake8 + Black + isort → 无配置时默认 Ruff；配置了 Mypy 就一并跑；只跑只读部分，不改环境与锁文件。
+
+**梦无矶项目约定（`references/mwj-conventions.md`）：** 从各项目归因与记忆提炼的 8 类审查项——注释写为什么与实测出处、设备命令参数列表加超时、ctypes 声明签名、对外协议只增不改、改系统状态独立回读、数据库搬迁与同步底线、凭据不进代码、测试走真实入口等。
+
 **审查流程（9 步）：**
 
 1. 预检上下文 — `git diff` 确定变更范围，识别关键路径
-2. 运行工具链（只读检查） — 探测项目工具链（uv/poetry/pip）后按顺序执行 Flake8 → Black `--check` → isort `--check-only` → Mypy，不修改代码
+2. 运行工具链（只读检查） — 探测门禁脚本 / Ruff / Flake8 家族与 .venv / uv / poetry 前缀后执行只读检查，不修改代码与环境
 3. SOLID 原则审查 — SRP / OCP / LSP / ISP / DIP 逐项检查
 4. 冗余代码识别 — 区分"立即可删"与"需计划后删"
 5. 安全扫描 — XSS、注入、SSRF、路径遍历、竞态条件、密钥泄露等
-6. 代码质量扫描 — 错误处理、N+1 查询、边界条件、静默失败
+6. 代码质量扫描 — 错误处理、N+1 查询、边界条件、静默失败（另加「梦无矶项目约定」专项）
 7. 工具结果分析 — 归类常见问题（未使用导入、布尔比较、f-string 等）
 8. 生成审查报告 — 按 P0–P3 分级输出，含统计信息
 9. 确认下一步 — 等待用户选择修复范围后再执行所有修复（含格式化）
@@ -249,6 +253,42 @@ Linux 定版 → Windows 打包验收 → 审批 → 正式发布。
 
 ---
 
+### `/ui-selfcheck` — 界面改动截图自检
+
+前端改动后，在隔离数据上起服务，用无头浏览器多视口、多状态截图，跑机器检查，再逐张亲自看图，修完重截，确认没问题才交给人。
+
+**流程：** 先找项目现成脚本与视口规定 → 隔离环境起服务（临时数据 / 模拟接口 / 独立端口）→ 截图（桌面 + 手机；有数据 / 空态 / 弹窗）→ 机器检查 + 导航真实点击可达 → Read 逐张看图（`visual-checklist.md`）→ 停服务、表格汇报（绝对路径 | 验证内容 | 结论）+ 未覆盖范围。
+
+**附带脚本 `scripts/shot.py`：** `uv run --with playwright` 运行，优先用本机 Chrome；支持多视口、`--full-height`、localStorage 注入、`storage_state`、URL glob 模拟接口、点击打开弹窗；自动检查控制台错误、接口 4xx/5xx、横向溢出、白屏，失败退出码 1，输出 `manifest.json`。
+
+**适配：** Vue + Vite、Electron（offscreen + CDP）、pywebview、纯 HTML；已知坑清单含 Vite HTTPS、inotify、ECharts 按需注册、Vue 模板花括号、导航注册、`pkill -f` 自杀等。
+
+**触发方式：** `/ui-selfcheck`，或说"截图看看"、"自检一下界面"、"你自己看过了吗"；改完页面/样式交付前主动触发。
+
+---
+
+### `/project-readthrough` — 只读通读
+
+只读通读整个项目或指定模块找隐藏问题，全程零改动，用户逐项选定后再修。
+
+**流程：** 确认范围与基线（不跑会改锁文件的命令）→ `.planning/<日期>-readthrough/` → 核心层自己读、其余分给只读子代理并抽查 → scratchpad 复现、证据分四档（已证实 / 疑似 / 需真机 / 卫生）→ 编号清单 + 覆盖盲区 → 用选项让用户挑 → 按批次修、回填结果、调用 `postmortem`。
+
+**触发方式：** `/project-readthrough`，或说"通读"、"找隐藏问题"、"审计一下"、"先不改，你看看"。
+
+---
+
+### `/session-handoff` — 收工、迁移、恢复
+
+| 模式 | 内容 |
+|------|------|
+| 收工交接 | 盘点（未提交/未推送/进程/后台任务/残留）→ 收拾 → 更新进度文件 → 写 `handoff-<日期>.md` 记忆（下一步起点、用户硬约束原话、未决项）→ 记忆在仓库的同步提交 |
+| 迁移 | 列清单 → 逐条分拣记忆归属 → `scripts/copy_sessions.py` 复制会话（只复制、sha256 逐文件校验、不覆盖）→ 写指针记忆 → 原件等用户授权再删 |
+| 恢复 | 按序读记忆与交接 → 进度文件 → git 与远端 → 后台任务与服务 → 半成品；先汇报再续做，不推翻已拍板决定 |
+
+**触发方式：** `/session-handoff`，或说"收工"、"交接"、"挪到 X 目录"、"恢复任务继续执行"、"额度恢复了继续"。
+
+---
+
 ## 目录结构
 
 ```
@@ -259,7 +299,8 @@ skills/
 │       ├── solid-principles.md         # SOLID 原则检查清单
 │       ├── security-risks.md           # 安全风险检查清单
 │       ├── code-quality.md             # 代码质量检查清单
-│       └── cleanup-plan.md             # 冗余代码清理模板
+│       ├── cleanup-plan.md             # 冗余代码清理模板
+│       └── mwj-conventions.md          # 梦无矶项目约定审查清单
 ├── req-doc-generator/
 │   ├── SKILL.md                        # 三阶段流水线定义
 │   ├── evals/evals.json                # 10 个评估用例
@@ -300,11 +341,28 @@ skills/
 │   ├── SKILL.md                        # 收工归因（三档粒度）
 │   └── references/
 │       └── templates.md                # 表格行 / 条目 / 独立归因文档模板
-└── release-ship/
-    ├── SKILL.md                        # 发版流程
+├── release-ship/
+│   ├── SKILL.md                        # 发版流程
+│   └── references/
+│       ├── version-locations.md        # 各技术栈版本号位置与规则
+│       └── windows-build-prompt.md     # Windows 打包验收提示词骨架
+├── ui-selfcheck/
+│   ├── SKILL.md                        # 界面改动截图自检
+│   ├── scripts/shot.py                 # 通用无头截图 + 机器检查脚本
+│   └── references/
+│       ├── scenario-format.md          # shot.py 用法与场景 JSON 格式
+│       ├── stack-recipes.md            # 各技术栈起服务与喂数据
+│       ├── visual-checklist.md         # 看图清单
+│       └── known-pitfalls.md           # 已知坑
+├── project-readthrough/
+│   ├── SKILL.md                        # 只读通读
+│   └── references/
+│       └── findings-template.md        # 通读发现模板与严重度参考
+└── session-handoff/
+    ├── SKILL.md                        # 收工交接 / 迁移 / 恢复
+    ├── scripts/copy_sessions.py        # 会话复制与校验（只复制不删除）
     └── references/
-        ├── version-locations.md        # 各技术栈版本号位置与规则
-        └── windows-build-prompt.md     # Windows 打包验收提示词骨架
+        └── handoff-template.md         # 交接记忆模板与记忆进仓库方案对比
 
 .claude/
 ├── settings.json                       # 项目级 hook 配置

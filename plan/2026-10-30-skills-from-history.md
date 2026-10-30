@@ -1,6 +1,6 @@
 # 从历史会话与项目反哺 Skill 方案（2026-10-30）
 
-> 状态：**第一批已完成**（2026-10-30）；第二批待用户启动。
+> 状态：**第一、二批已完成**（2026-10-30）；第三批（B1 / C2 / F）与 D 组待启动。
 > 调研范围：MyProject 下 12 个项目的代码与文档、约 160 条记忆、约 60 个历史会话（去重后 776 条用户原话）。
 
 ## 一、调研结论（依据）
@@ -114,3 +114,27 @@
 - P0：版本号 grep 会误改「X.Y.Z 起」这类历史说明 → 只改「当前版本声明」，并排除 target/dist 目录。
 - P0：MSCA 的模型是「验收后打 tag」，与原写法的发版顺序相反 → 改为识别 A/B/C 三种发版模型；执行侧补充「任务单明确授权的发版动作」这一例外。
 - P1：文档路径探测不全、未判断该不该升版、审批清单缺少旧包/人工互证/发布类核对项、没有空闲任务单约定、触发词过宽、归因的提交时机前后矛盾。
+
+## 六、第二批任务清单（2026-10-30 启动）
+
+- [x] U1 素材：截图自检现有脚本（AiTestProject scripts/lib、MoneyFree shot_pages.py、MSCA/Sujian 做法）+ mwj-autonomous-ui-skill-v3
+- [x] U2 素材：通读审计（MSCA .planning 通读笔记、iPhoneUsbTouch v0.3.2 通读清单）+ 会话交接/迁移/恢复（handoff 记忆、sync_memory.py、progress.md）
+- [x] U3 B2 py-code-review 升级：ruff 工具链探测 + 梦无矶特有审查项
+- [x] U4 C1 ui-selfcheck
+- [x] U5 A5 project-readthrough
+- [x] U6 A4 session-handoff
+- [x] U7 审查 + 真实项目干跑；修复
+- [x] U8 同步 README / CLAUDE.md / changelog；分 skill 提交并推送 Gitee
+
+### 第二批审查结论（2026-10-30）
+
+子代理只读审查，并在 iPhoneUsbTouch、OcrYoloEngine、MwjZhiWen、MwjAppPrefTrace、imirror 上干跑。查出 P1 5 条、P2 十余条，均已修复：
+- shot.py：favicon 404 被误报 → 已过滤，「Failed to load resource」不再重复计数；交互步骤失败时整批中断 → 改为记进 step_errors 后继续截图；开启 --full-height 时文件名与实际尺寸不符 → 已修正；新增 allow_errors，用于截失败态。
+- copy_sessions.py：出错后仍打印「全部一致」→ 已修正；会话 id 未校验，存在路径穿越 → 增加 UUID 校验；新增「源桶等于目标桶」时拒绝执行。
+- project-readthrough：「零改动」与在仓库里建 .planning 相矛盾 → 工作目录默认放到仓库外；与 delegate-to-cli 的触发词划清界限。
+- py-code-review：执行门禁脚本时不再运行会改环境的步骤，命令前缀改为 .venv/bin 或 --no-sync；pyflakes 规则并入第 1 档；description 限定为 Python。
+- mwj-conventions：只审 diff 中的行，带理由的 noqa 不报，服务类条目单独标注。
+
+干跑附带发现（不属于本仓库）：
+- imirror 的 tests/test_windows_tools.py 在 Linux 上失败，属于 Windows 专用测试却没加 skip。
+- MwjAppPrefTrace 报告页在手机宽度下横向溢出 503px，卡片内的长文本超出卡片。

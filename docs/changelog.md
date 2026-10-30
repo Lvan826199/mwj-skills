@@ -1,5 +1,15 @@
 # 更新日志
 
+## [从历史会话反哺第二批 skill] - 2026-10-30
+
+### 新增
+- 新增 `ui-selfcheck` skill：界面改动截图自检，含通用截图脚本 `scripts/shot.py`（多视口、模拟接口、localStorage 注入、控制台/接口/横向溢出/白屏机器检查、manifest 输出）、看图清单、各技术栈适配与已知坑清单
+- 新增 `project-readthrough` skill：只读通读，零改动、子代理分工 + 主线抽查、证据四档、编号清单交用户选、修复回填
+- 新增 `session-handoff` skill：收工交接 / 会话与记忆迁移 / 中断恢复三模式，含交接记忆模板与 `scripts/copy_sessions.py`（只复制、sha256 校验、不覆盖不删除）
+
+### 变更
+- `py-code-review` 第二步改为按优先级探测工具链（项目门禁脚本或项目规定命令 → Ruff → Flake8 家族），无配置时默认 Ruff，只跑只读部分不改环境；新增第六步半「梦无矶项目约定审查」与 `references/mwj-conventions.md`；报告格式改为工具链无关
+
 ## [从历史会话反哺第一批 skill] - 2026-10-30
 
 ### 新增
