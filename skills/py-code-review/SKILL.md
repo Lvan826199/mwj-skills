@@ -1,6 +1,6 @@
 ---
 name: py-code-review
-description: Python 代码审查流程。自动探测项目工具链（项目门禁脚本 / Ruff / Flake8+Black+isort / pyflakes，加 Mypy）做只读检查，同时进行深度审查（SOLID 原则、安全风险、代码质量、梦无矶项目约定：注释写为什么与实测出处、设备命令参数列表加超时、对外协议只增不改、改系统状态要独立回读等），并提供修复建议。审查优先：先报告，经用户确认后再修复。用户要求审查 Python 代码（「review 一下」「代码审查」「检查一下这个 py」）或 Python 项目提交前触发；纯前端（Vue/TS）改动不触发。
+description: Python 代码审查流程。自动探测项目工具链（项目门禁脚本 / Ruff / Flake8+Black+isort / pyflakes，加 Mypy）做只读检查，同时进行深度审查（SOLID 原则、安全风险、代码质量、梦无矶编码规则：引用 mwj-python-style 的唯一清单），并提供修复建议。审查优先：先报告，经用户确认后再修复。用户要求审查 Python 代码（「review 一下」「代码审查」「检查一下这个 py」）或 Python 项目提交前触发；纯前端（Vue/TS）改动不触发。
 ---
 
 # 代码审查技能
@@ -96,9 +96,15 @@ description: Python 代码审查流程。自动探测项目工具链（项目门
 
 标记可能导致静默失败或生产事故的问题。
 
-### 第六步半：梦无矶项目约定审查
+### 第六步半：梦无矶编码规则审查
 
-加载 `references/mwj-conventions.md`，逐条对照变更代码。这些都是在真实项目里踩过的坑：注释要写「为什么」和实测出处；设备/外部命令要用参数列表并带超时；ctypes 必须声明签名；对外协议只增不改；改了系统状态要独立回读验证；数据库要「复制 → 核对 → 切换」；凭据不能进代码和日志；测试要走真实入口；版本号只能有一个来源；确定性计算不能交给 AI。违反的按清单里标的级别报告。
+逐条对照 **mwj-python-style skill 的 `references/rules.md`**，这是编码规则的唯一清单，写代码和审查共用一份。路径查找顺序：
+1. 同级目录 `../mwj-python-style/references/rules.md`
+2. `~/.claude/skills/mwj-python-style/references/rules.md`
+
+找不到时跳过本步，并在报告里注明「未安装 mwj-python-style，编码规则未审」。
+
+清单中的条目是在真实项目里踩过的坑，例如：注释写「为什么」并注明实测出处、设备命令用参数列表并带超时、ctypes 声明签名、对外协议只增不改、改了系统状态要独立回读、数据库按「复制 → 核对 → 切换」、凭据不进代码、测试走真实入口、版本号只有一个来源、确定性计算不交给 AI。**只审 diff 里新增或修改的行**；按清单里标注的 P 级报告。
 
 ### 第七步：分析工具检查结果
 
@@ -170,7 +176,7 @@ description: Python 代码审查流程。自动探测项目工具链（项目门
 - Lint：X 个问题
 - 格式：X 个文件需格式化
 - Mypy：X 个类型错误（未配置则写「未配置」）
-- 梦无矶约定：X 条
+- 梦无矶编码规则：X 条（或「未安装 mwj-python-style，未审」）
 
 ### 📊 统计信息
 - 检查文件数: X
@@ -388,7 +394,7 @@ black <变更路径> && isort <变更路径>
 | `references/security-risks.md` | Web/应用安全与运行时风险清单 |
 | `references/code-quality.md` | 错误处理、性能、边界条件 |
 | `references/cleanup-plan.md` | 删除候选项与后续计划模板 |
-| `references/mwj-conventions.md` | 梦无矶项目约定（真实踩坑提炼，含建议级别） |
+| `../mwj-python-style/references/rules.md` | 梦无矶编码规则唯一清单（mwj-python-style skill，含建议级别） |
 
 ---
 
@@ -423,7 +429,7 @@ black <变更路径> && isort <变更路径>
 - 检查文件：22 个
 - Lint 问题：0（Ruff）
 - 格式：无需调整
-- 梦无矶约定：0
+- 梦无矶编码规则：0
 - 架构问题：0
 - 安全风险：0
 
