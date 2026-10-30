@@ -1,5 +1,18 @@
 # 更新日志
 
+## [编码习惯 / 架构 / 记忆三个 skill] - 2026-10-30
+
+### 新增
+- 新增 `mwj-python-style` skill：写代码时就遵守的编码习惯，`references/rules.md` 为编码规则唯一清单（由原 `py-code-review/references/mwj-conventions.md` 迁移并扩充：模块结构、命名单位、错误码异常体系、日志脱敏、并发与外部命令、CLI 契约、打包路径与 Windows 兼容、数据底线、测试、反模式）
+- 新增 `mwj-architecture` skill：A–F 六种架构模式库（FastAPI 分层 / 六边形 / CLI+sidecar / Electron+Python / pywebview+Android / 推理引擎服务）、选型表与跨模式原则，附 AST 依赖方向架构测试模板
+- 新增 `mwj-memory` skill：记忆方案选型、写入格式规范、`scripts/memory_sync.py`（三方同步、冲突不覆盖、MEMORY.md 按行合并、删除只报告、敏感信息拦截、锁、审计）
+
+### 变更
+- `py-code-review` 第六步半改为引用 `mwj-python-style/references/rules.md`，删除 `references/mwj-conventions.md`（规则只保留一份）
+
+### 修复
+- `mwj-project-init` 的 AGENTS.md 模板补上 `@docs/memory/MEMORY.md`：只用文字提到 MEMORY.md 不会被 Claude Code 加载
+
 ## [mwj-design-system v2.0] - 2026-10-30
 
 ### 修复

@@ -65,7 +65,7 @@
 |---|---|---|
 | D1 | `novel-anti-ai-review` 反 AI 味审稿：句长、碎句率、句号率、口癖、手续词、数字密度、人名性别一致性 | Sujian |
 | D2 | `ios-usb-device-kb` iOS USB 真机知识：CoreDevice HID、usbmux、DDI、版本门槛 | iPhoneUsbTouch，MSCA 和 imirror 引用它 |
-| D3 | `anamana-api-testing` 接口测试口径：废弃接口、required 标记不可信、分档验证、重试 3 次 | AiTestProject |
+| D3 | `api-testing-rules` 接口测试口径：废弃接口、required 标记不可信、分档验证、重试 3 次 | AiTestProject |
 
 > 用户决定（2026-10-30）：D 组**也收进 mwj-skills**，集中管理，各项目引用。
 
@@ -150,3 +150,23 @@
 - [x] B1 mwj-project-init（AGENTS.md 为源；在 scratchpad 生成 mwj-demo 实跑门禁全绿）
 - [x] C2 mwj-design-system v2.0（用户定：收编柔和变体、暂不做暗色、各项目可有自己风格；原计划的 core/实现层拆分改为不拆——需求已由适用范围 + 变体一节满足，避免大改 646 行引入回归）
 - [ ] D1–D3 领域 skill：用户 2026-10-30 决定这一轮不做。注意 mwj-skills 是公开仓库，以后要做时，先定好哪些内容放进项目内、不公开
+
+## 八、补全：编码习惯 / 架构 / 记忆（2026-10-30 用户追加）
+
+- [x] G1 调研：三路子代理（编码习惯、架构模式、记忆方案）
+- [x] G2 mwj-python-style（写代码时就遵守；约定清单只保留这一份，py-code-review 改为引用）
+- [x] G3 mwj-architecture（5 种架构模式：适用场景、骨架、不可违反的规则、架构测试）
+- [x] G4 mwj-memory（方案选型、通用同步脚本、格式规范、审计）
+- [x] G5 审查 + 真实项目干跑 + 敏感信息扫描（公开仓库）
+- [x] G6 同步文档、提交、推送
+
+### 补全批审查结论（2026-10-30）
+
+审查没有 P0，P1 有 8 条，都已修复：
+- memory_sync：删除的记忆会「复活」→ 没处理的条目保留上次的哈希；只有索引不一致时 check 返回 0 → 改为返回 1。
+- memory_sync：敏感词规则漏报、误报 → IP 要求完整 4 段，补全常见 key 前缀，「见/在」这类指针说法不算口令；合并后的索引写入前也要扫描。
+- memory_sync：软链没有专门处理 → 软链指向仓库目录的不同步，指向别处的报错停下。
+- memory_sync：format 模板过不了 audit → 解析时剥掉行尾注释、兼容 CRLF；方案 C 只审带 frontmatter 的文件。
+- rules.md：Selector 事件循环被写成通用规则 → 改为默认 Proactor；Optional 规则和「像周围代码」矛盾 → 改为跟随所在文件的写法。
+- 架构测试模板：一条违规报两次 → 改为按被禁的层只报一次；补扫 match 分支。新版在 AutoAppAgent 上 2 项通过，与项目自带的测试结论一致。
+- 公开仓库扫描：本次新增和改动没有敏感信息；方案文件里一个内部系统名已改成通用叫法。

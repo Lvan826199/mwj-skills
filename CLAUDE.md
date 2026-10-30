@@ -33,6 +33,9 @@
 | `project-readthrough` | `/project-readthrough` 或说"通读"、"找隐藏问题"、"先不改，你看看" | 只读通读找隐藏问题，证据分级编号，用户逐项选定后再修 |
 | `session-handoff` | `/session-handoff` 或说"收工"、"交接"、"挪到 X 目录"、"恢复任务继续执行" | 收工交接 / 会话与记忆迁移（只复制校验）/ 中断后恢复 |
 | `mwj-project-init` | `/mwj-project-init` 或说"新建项目"、"初始化项目"、"规范对齐" | 新建项目脚手架（AGENTS.md 单源 + uv/Ruff/Mypy/pytest 门禁，实跑全绿）/ 已有项目规范对齐审计 |
+| `mwj-python-style` | `/mwj-python-style` 或在 Python 项目写代码时；说"按我的风格写" | 写代码时就遵守的编码习惯，规则唯一清单与 py-code-review 共用 |
+| `mwj-architecture` | `/mwj-architecture` 或说"用什么架构"、"分层"、"补架构测试" | A–F 六种架构模式库、选型表、越层判断、AST 依赖方向架构测试模板 |
+| `mwj-memory` | `/mwj-memory` 或说"记忆进仓库"、"同步记忆"、"审计记忆" | 记忆方案选型、写入规范、三方同步脚本（冲突不覆盖、敏感拦截）与审计 |
 
 ---
 

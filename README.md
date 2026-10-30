@@ -14,7 +14,7 @@ Python 代码审查流程，结合工具检查与资深工程师视角的深度�
 
 **工具链自动探测（按优先级）：** 项目门禁脚本或项目规定的命令（如只用 pyflakes）→ Ruff → Flake8 + Black + isort → 无配置时默认 Ruff；配置了 Mypy 就一并跑；只跑只读部分，不改环境与锁文件。
 
-**梦无矶项目约定（`references/mwj-conventions.md`）：** 从各项目归因与记忆提炼的 8 类审查项——注释写为什么与实测出处、设备命令参数列表加超时、ctypes 声明签名、对外协议只增不改、改系统状态独立回读、数据库搬迁与同步底线、凭据不进代码、测试走真实入口等。
+**梦无矶编码规则：** 第六步半逐条对照 `mwj-python-style` 的 `references/rules.md`（编码规则唯一清单，写代码与审查共用）；未安装 mwj-python-style 时跳过并在报告注明。
 
 **审查流程（9 步）：**
 
@@ -302,6 +302,43 @@ Linux 定版 → Windows 打包验收 → 审批 → 正式发布。
 
 ---
 
+### `/mwj-python-style` — Python 编码习惯
+
+写代码时就遵守的编码习惯（不是等审查再改），规则唯一清单 `references/rules.md` 与 `py-code-review` 共用。
+
+**覆盖：** 模块结构与命名（中文 docstring、`from __future__`、单位后缀）、注释写为什么与实测出处、异常基类 + 稳定错误码 + 可行动报错、日志与脱敏、asyncio / subprocess `_run` / 一层重试、CLI `main(argv) -> int` 与退出码与 `--json`、打包路径与 Windows 兼容、数据安全底线、测试写法、反模式。项目规则与清单冲突时以项目为准。
+
+**触发方式：** `/mwj-python-style`，或在 Python 项目里新写/修改代码时；说"按我的风格写"、"编码规范"。
+
+---
+
+### `/mwj-architecture` — 架构模式与守护
+
+| 模式 | 适用 |
+|------|------|
+| A FastAPI 分层平台 | 多用户、权限、数据库、后台任务 |
+| B 六边形架构 | 领域规则复杂、外部依赖多、长期防腐化 |
+| C CLI + sidecar（含引擎 CLI + 平台变体） | 设备能力同时给人和多语言宿主用 |
+| D Electron + Python 后端 | 离线桌面 + 可 Web 部署 |
+| E pywebview + Android WebView | 单用户本地数据、桌面手机共用 |
+| F 推理引擎服务 | 重计算、限流、可观测 |
+
+每种模式含骨架、依赖规则、不可违反的规则、守护手段与踩过的坑；附 AST 依赖方向架构测试模板（跳过 `TYPE_CHECKING`、展开相对导入、可禁三方库、豁免只许减）。
+
+**触发方式：** `/mwj-architecture`，或说"用什么架构"、"分层"、"这样放对吗"、"补架构测试"。
+
+---
+
+### `/mwj-memory` — 记忆存储方式
+
+**方案：** A 同步脚本（推荐，Claude + Codex / 多机器）、B 软链、C 根目录 MEMORY.md；无论哪种都必须 `@` 导入索引（只用文字提到不会加载）。
+
+**`scripts/memory_sync.py`：** `check` / `sync` / `audit` / `link`。三方同步（按上次同步的哈希判断哪边改了）：只一边改 → 同步；两边都改 → 报冲突不覆盖；MEMORY.md 按行合并；删除只报告；含内网 IP / 口令 / 密钥拒绝进仓库；锁文件防并发；本机桶按仓库路径正向编码。`audit` 检查 frontmatter、Why、索引一一对应、敏感信息、过期、`@` 导入是否生效。
+
+**触发方式：** `/mwj-memory`，或说"记忆进仓库"、"同步记忆"、"整理/审计记忆"、"记忆太乱"。
+
+---
+
 ## 目录结构
 
 ```
@@ -312,8 +349,7 @@ skills/
 │       ├── solid-principles.md         # SOLID 原则检查清单
 │       ├── security-risks.md           # 安全风险检查清单
 │       ├── code-quality.md             # 代码质量检查清单
-│       ├── cleanup-plan.md             # 冗余代码清理模板
-│       └── mwj-conventions.md          # 梦无矶项目约定审查清单
+│       └── cleanup-plan.md             # 冗余代码清理模板
 ├── req-doc-generator/
 │   ├── SKILL.md                        # 三阶段流水线定义
 │   ├── evals/evals.json                # 10 个评估用例
@@ -378,12 +414,24 @@ skills/
 │   ├── scripts/copy_sessions.py        # 会话复制与校验（只复制不删除）
 │   └── references/
 │       └── handoff-template.md         # 交接记忆模板与记忆进仓库方案对比
-└── mwj-project-init/
-    ├── SKILL.md                        # 新建脚手架 / 规范对齐审计
-    └── references/
-        ├── agents-md-template.md       # AGENTS.md / CLAUDE.md / 记忆 / 文档 / .gitignore 模板
-        ├── python-scaffold.md          # pyproject、src、tests、check.sh、服务类与打包类追加
-        └── audit-checklist.md          # 规范对齐审计清单
+├── mwj-project-init/
+│   ├── SKILL.md                        # 新建脚手架 / 规范对齐审计
+│   └── references/
+│       ├── agents-md-template.md       # AGENTS.md / CLAUDE.md / 记忆 / 文档 / .gitignore 模板
+│       ├── python-scaffold.md          # pyproject、src、tests、check.sh、服务类与打包类追加
+│       └── audit-checklist.md          # 规范对齐审计清单
+├── mwj-python-style/
+│   ├── SKILL.md                        # 写代码时的编码习惯
+│   └── references/rules.md             # 编码规则唯一清单（py-code-review 共用）
+├── mwj-architecture/
+│   ├── SKILL.md                        # 选型 / 越层判断 / 补架构测试
+│   └── references/
+│       ├── patterns.md                 # A–F 六种架构模式与通用原则
+│       └── test_architecture_template.py  # AST 依赖方向架构测试模板
+└── mwj-memory/
+    ├── SKILL.md                        # 记忆方案选型、写入、同步、审计
+    ├── scripts/memory_sync.py          # 三方同步与审计脚本
+    └── references/format.md            # 记忆格式规范与审计清单
 
 .claude/
 ├── settings.json                       # 项目级 hook 配置
