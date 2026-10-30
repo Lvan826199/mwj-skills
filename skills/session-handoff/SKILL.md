@@ -28,7 +28,7 @@ description: 会话的收尾、搬家与续接，三个模式。收工交接：�
    - **下一步从哪开始**：先跑哪个命令、先读哪份文件。
    - **用户的硬约束和已拍板的决定**：原话照抄，例如「没说做就不允许改代码」「不要重开方案讨论」。
    - **未决项**：等用户决定的、等真机回执的。
-5. **记忆在仓库里的**（`docs/memory/`、`docs/agent-memory/`、根目录 `MEMORY.md`）：同步、提交、推送。有同步脚本的按项目方式做，例如 MoneyFree 的 `scripts/sync_memory.py`。
+5. **记忆在仓库里的**（`docs/memory/`、`docs/agent-memory/`、根目录 `MEMORY.md`）：同步、提交、推送。有同步脚本的按项目方式做（例如 MoneyFree 的 `scripts/sync_memory.py`）；没有的用 mwj-memory skill 的 `memory_sync.py sync`。
 6. 汇报：一段话说清做完了什么、没做完什么、下次从哪开始，最后给出交接文件路径。
 
 > 问题解决后的那一轮还要调用 `postmortem`。交接只记状态，归因单独写。

@@ -17,6 +17,10 @@
 - `docs/memory/MEMORY.md`：共享记忆索引（跨会话、跨机器的决定与踩坑）
 - `docs/问题归因.md`：历史问题与根因，排障先在这里搜
 
+共享记忆（用 @ 导入，Claude Code 才会自动加载）：
+
+@docs/memory/MEMORY.md
+
 ## 语言
 - 回复、文档、注释、提交描述一律用简体中文；标识符、命令、专有名词保持原文。
 - 注释写「为什么」，不写「做了什么」；超时、阈值等常量要注明出处（哪次实测、哪份回执）。
@@ -51,6 +55,7 @@
 - 默认只升末位；升中间位或主版本要用户明确同意。发版走 release-ship。
 
 ## 记忆
+- **只用文字写「先读 MEMORY.md」不会被加载**，必须保留上面那行 `@docs/memory/MEMORY.md`。Codex 不解析 @，按文字说明去读。
 - 共享记忆放在 `docs/memory/`，一条一个文件（frontmatter：name / description / type；正文写 Why / How to apply），在 `docs/memory/MEMORY.md` 里加一行索引。
 - 本机记忆桶（`~/.claude/projects/...`）只放和这台机器相关的内容。
 - 凭据、token、本机绝对路径不写进记忆。
@@ -72,7 +77,7 @@
 ```markdown
 # 共享记忆索引
 
-一行一条：`- [标题](文件.md) — 一句话说明`。规则见 AGENTS.md「记忆」一节。
+一行一条：`- [标题](文件.md) — 一句话说明`。规则见 AGENTS.md「记忆」一节；同步与审计用 mwj-memory skill 的 `memory_sync.py`。
 ```
 
 ## docs/问题归因.md
