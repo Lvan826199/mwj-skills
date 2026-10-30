@@ -23,7 +23,7 @@
 |-------|----------|------|
 | `py-code-review` | `/py-code-review` | Python 代码审查（9 步流程，P0–P3 分级；自动探测 Ruff/Flake8 工具链，含梦无矶项目约定审查） |
 | `req-doc-generator` | `/req-doc-generator` | 三阶段需求/数据库/API 文档生成 |
-| `mwj-design-system` | `/mwj-design-system` | MWJ Design System v1.2 前端规范执行器 |
+| `mwj-design-system` | `/mwj-design-system` | MWJ Design System v2.0 前端规范执行器（标准 / 柔和双变体；项目有自己风格时不强制） |
 | `ui-ux-pro-max-new` | `/ui-ux-pro-max-new` | UI/UX 设计智能助手（67 风格/96 配色/13 技术栈） |
 | `delegate-to-cli` | `/delegate-to-cli` 或提到"派 kimi/codex/claude 跑"、"整体巡检/审计" | 将读多写少的子任务委派给本地 CLI 智能体（kimi-cli/codex/claude），并行执行、严格验收并输出 token 节省报告 |
 | `device-handoff` | `/device-handoff` 或说"给 Windows 提示词"、"回执来了"、"按联调任务执行" | 跨机器真机联调闭环：Linux 侧下发自检/任务单/回执审批/复验，Windows 侧照单执行并写回执 |

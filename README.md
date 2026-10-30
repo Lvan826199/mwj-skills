@@ -95,7 +95,9 @@ Python 代码审查流程，结合工具检查与资深工程师视角的深度�
 
 ### `/mwj-design-system` — MWJ 设计系统规范执行器
 
-MWJ Design System v1.2 前端开发规范执行器，确保所有前端代码输出严格遵循 Mwj 一体化测试平台设计系统。
+MWJ Design System v2.0 前端开发规范执行器，用于已采用 MWJ 白蓝极简风格的项目。
+
+**v2.0 变化：** 先判断适用范围——每个项目可以有自己的风格，有独立风格的项目（Sujian、AutoAppAgent、MSCA 等）不强制套用；新增「标准 / 柔和」两个变体（柔和变体：页面底色 `#EEF2F8`、`--radius-lg` 20px、允许深色侧栏，用于 MoneyFree、MwjZhiWen、MwjAppPrefTrace）；收回下拉框规格 `select-dropdown-spec.md` 与柔和变体参照 `homepage-style-guide.md`；补 `--color-warning-bg` / `--color-danger-bg`。
 
 **适用场景：** 开发/重构 Vue 组件、前端页面、UI 界面；涉及 Vue3 + TypeScript + TailwindCSS + Element Plus 的任何前端开发任务。
 
@@ -320,9 +322,11 @@ skills/
 │       ├── database-design-template.md # 数据库设计模板
 │       └── api-design-template.md      # API 设计文档模板
 ├── mwj-design-system/
-│   ├── SKILL.md                        # MWJ Design System v1.2 执行规范
+│   ├── SKILL.md                        # MWJ Design System v2.0 执行规范（适用范围 + 双变体）
 │   └── references/
-│       └── migration-guide.md          # SCSS → CSS Token 迁移实战规则
+│       ├── migration-guide.md          # SCSS → CSS Token 迁移实战规则
+│       ├── select-dropdown-spec.md     # 下拉框样式规格
+│       └── homepage-style-guide.md     # 柔和变体落地参照（MwjAppPrefTrace 首页）
 ├── ui-ux-pro-max-new/
 │   ├── SKILL.md                        # 设计智能助手主文件
 │   ├── data/                           # 设计数据库（配色/图表/风格/排版等 CSV）

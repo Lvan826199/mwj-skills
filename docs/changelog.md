@@ -1,5 +1,16 @@
 # 更新日志
 
+## [mwj-design-system v2.0] - 2026-10-30
+
+### 新增
+- `mwj-design-system` 新增「适用范围」：每个项目可以有自己的风格（用户 2026-10-30 定），先探测项目是否采用 MWJ，独立风格项目不强制套用
+- 新增「标准 / 柔和」双变体：柔和变体收编 MoneyFree / MwjZhiWen / MwjAppPrefTrace 的取值（`#EEF2F8`、`--radius-lg` 20px、允许深色侧栏）
+- 从项目副本收回 `references/select-dropdown-spec.md`（下拉框规格）与 `references/homepage-style-guide.md`（柔和变体落地参照）；补 `--color-warning-bg` / `--color-danger-bg`
+
+### 变更
+- description 不再要求"所有前端 UI 开发都必须触发"，改为采用 MWJ 风格的项目或用户明确要求时触发
+- 「禁止多套 UI 风格混用」限定为同一项目内
+
 ## [新增 mwj-project-init] - 2026-10-30
 
 ### 新增
