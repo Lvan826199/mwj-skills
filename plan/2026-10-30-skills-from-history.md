@@ -145,8 +145,8 @@
 
 - [x] F1 写 sync_skills.py（check / link-user / push-projects，默认演练）
 - [x] F2 收回 ui-ux-pro-max-new 的 lint 修复：项目副本比本仓库新，差异方向已核实
-- [ ] F3 执行 link-user 和 push-projects：等用户确认
+- [x] F3 执行 link-user 和 push-projects：用户 2026-10-30 决定暂不链接；项目副本只报告、不改动
 - [ ] F4 评估只在项目里有的 skill：msca-handoff 已由 device-handoff 覆盖；agent-rules-single-source 并入 B1；mwj-autonomous-ui-skill-v3 和 design-system 多出的 reference 并入 C2
-- [ ] B1 mwj-project-init
+- [x] B1 mwj-project-init（AGENTS.md 为源；在 scratchpad 生成 mwj-demo 实跑门禁全绿）
 - [ ] C2 mwj-design-system v2.0
 - [ ] D1–D3 领域 skill

@@ -289,6 +289,17 @@ Linux 定版 → Windows 打包验收 → 审批 → 正式发布。
 
 ---
 
+### `/mwj-project-init` — 项目脚手架与规范对齐
+
+| 模式 | 内容 |
+|------|------|
+| 新建 | 收集信息（类型 / Python 版本 / 远端 / 是否打包）→ 生成 AGENTS.md（唯一规则源）+ CLAUDE.md（`@AGENTS.md`）、`docs/memory/` 共享记忆、问题归因、CHANGELOG、.gitignore；Python 项目加 uv + src 布局 + Ruff + Mypy strict + pytest 标记 + `importlib.metadata` 版本 + `scripts/check.sh` → 实跑门禁全绿才交付 |
+| 审计 | 按清单只读检查已有项目（规则单源、共享记忆、文档套件、工具链、仓库卫生、skill 副本）→ 出偏差表 → 用户勾选后逐项修改 |
+
+**触发方式：** `/mwj-project-init`，或说"新建项目"、"初始化项目"、"搭个脚手架"、"检查一下项目规范"、"规范对齐"。
+
+---
+
 ## 目录结构
 
 ```
@@ -358,11 +369,17 @@ skills/
 │   ├── SKILL.md                        # 只读通读
 │   └── references/
 │       └── findings-template.md        # 通读发现模板与严重度参考
-└── session-handoff/
-    ├── SKILL.md                        # 收工交接 / 迁移 / 恢复
-    ├── scripts/copy_sessions.py        # 会话复制与校验（只复制不删除）
+├── session-handoff/
+│   ├── SKILL.md                        # 收工交接 / 迁移 / 恢复
+│   ├── scripts/copy_sessions.py        # 会话复制与校验（只复制不删除）
+│   └── references/
+│       └── handoff-template.md         # 交接记忆模板与记忆进仓库方案对比
+└── mwj-project-init/
+    ├── SKILL.md                        # 新建脚手架 / 规范对齐审计
     └── references/
-        └── handoff-template.md         # 交接记忆模板与记忆进仓库方案对比
+        ├── agents-md-template.md       # AGENTS.md / CLAUDE.md / 记忆 / 文档 / .gitignore 模板
+        ├── python-scaffold.md          # pyproject、src、tests、check.sh、服务类与打包类追加
+        └── audit-checklist.md          # 规范对齐审计清单
 
 .claude/
 ├── settings.json                       # 项目级 hook 配置

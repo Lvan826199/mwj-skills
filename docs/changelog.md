@@ -1,5 +1,10 @@
 # 更新日志
 
+## [新增 mwj-project-init] - 2026-10-30
+
+### 新增
+- 新增 `mwj-project-init` skill：新建模式生成 AGENTS.md 唯一规则源（用户 2026-10-30 定）+ `@AGENTS.md` 的 CLAUDE.md、仓库内共享记忆、中文文档套件与 Python 脚手架（uv / src 布局 / Ruff / Mypy strict / pytest 标记 / importlib.metadata 版本 / check.sh 门禁），交付前实跑门禁；审计模式按清单只读检查已有项目并出偏差表；吸收 OcrYoloEngine `agent-rules-single-source` 的单源与 gitignore 规则
+
 ## [skill 分发机制] - 2026-10-30
 
 ### 新增

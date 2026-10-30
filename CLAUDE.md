@@ -32,6 +32,7 @@
 | `ui-selfcheck` | `/ui-selfcheck` 或说"截图看看"、"自检一下界面"；界面改动交付前主动触发 | 界面改动截图自检：隔离环境、多视口多状态截图、机器检查、逐张看图，附 `shot.py` |
 | `project-readthrough` | `/project-readthrough` 或说"通读"、"找隐藏问题"、"先不改，你看看" | 只读通读找隐藏问题，证据分级编号，用户逐项选定后再修 |
 | `session-handoff` | `/session-handoff` 或说"收工"、"交接"、"挪到 X 目录"、"恢复任务继续执行" | 收工交接 / 会话与记忆迁移（只复制校验）/ 中断后恢复 |
+| `mwj-project-init` | `/mwj-project-init` 或说"新建项目"、"初始化项目"、"规范对齐" | 新建项目脚手架（AGENTS.md 单源 + uv/Ruff/Mypy/pytest 门禁，实跑全绿）/ 已有项目规范对齐审计 |
 
 ---
 
