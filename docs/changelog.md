@@ -1,5 +1,14 @@
 # 更新日志
 
+## [skill 分发机制] - 2026-10-30
+
+### 新增
+- 新增 `scripts/sync_skills.py`：以本仓库为唯一来源分发 skill，`check` 报告漂移、`link-user` 建用户级软链、`push-projects` 更新项目副本；默认演练，副本有独有文件时拒绝覆盖
+- `CLAUDE.md` 新增「Skill 分发规则」
+
+### 修复
+- `ui-ux-pro-max-new` 收回项目副本里的 lint 修复：删除未使用的导入与变量、去掉无占位符的 f-string（行为不变，`--persist` 实测正常）
+
 ## [从历史会话反哺第二批 skill] - 2026-10-30
 
 ### 新增

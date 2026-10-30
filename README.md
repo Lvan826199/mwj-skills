@@ -369,10 +369,23 @@ skills/
 └── hooks/
     └── check-commit.py                 # git commit 拦截脚本
 
+scripts/
+└── sync_skills.py                      # skill 分发与漂移报告
+
 docs/
 ├── changelog.md                        # 版本更新日志
 └── bug-fixes.md                        # Bug 修复记录
 ```
+
+## Skill 分发
+
+本仓库 `skills/` 为唯一来源，用 `scripts/sync_skills.py` 分发（默认演练，`--apply` 才写入）：
+
+| 子命令 | 作用 |
+|--------|------|
+| `check` | 报告 `~/.claude/skills` 与各项目副本相对本仓库的漂移（SAME / DIFF / MISS / ONLY） |
+| `link-user` | 在 `~/.claude/skills` 下建软链指向本仓库；旧复制件挪到 `.trash/` |
+| `push-projects` | 用本仓库更新各项目里已存在的副本（复制，不新增）；副本有独有文件时拒绝覆盖 |
 
 ## Hook 配置说明
 

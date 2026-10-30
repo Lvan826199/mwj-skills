@@ -35,6 +35,23 @@
 
 ---
 
+## Skill 分发规则
+
+本仓库 `skills/` 是所有 skill 的**唯一来源**，修改只在这里做，然后用 `scripts/sync_skills.py` 分发：
+
+```bash
+python scripts/sync_skills.py check                    # 报告用户级与各项目副本的漂移
+python scripts/sync_skills.py link-user [--apply]      # ~/.claude/skills/<name> 软链到本仓库
+python scripts/sync_skills.py push-projects [--apply]  # 更新各项目里已存在的副本（复制）
+```
+
+- 默认只演练，加 `--apply` 才写入；写入用户级目录和其他项目前须经用户确认
+- 用户级用软链（改一处立即生效）；项目副本跟项目仓库走、需在 Windows 可用，用复制
+- 副本里有本仓库没有的文件时脚本拒绝覆盖：先评估并收回本仓库，再分发
+- 在项目里直接改过的 skill（如 lint 修复），先判断差异方向，较新的一方收回本仓库
+
+---
+
 ## 上下文管理规则
 
 **压缩触发条件：** Token 用量 ≥ 80%
