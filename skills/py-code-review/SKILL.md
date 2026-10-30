@@ -1,6 +1,6 @@
 ---
 name: py-code-review
-description: Python 代码审查流程。运行代码质量检查工具（Flake8、Black、isort、Mypy），同时进行深度架构审查（SOLID原则、安全风险、代码质量），并提供修复建议。审查优先：先报告，经用户确认后再修复。
+description: Python 代码审查流程。自动探测项目工具链（项目门禁脚本 / Ruff / Flake8+Black+isort / pyflakes，加 Mypy）做只读检查，同时进行深度审查（SOLID 原则、安全风险、代码质量、梦无矶项目约定：注释写为什么与实测出处、设备命令参数列表加超时、对外协议只增不改、改系统状态要独立回读等），并提供修复建议。审查优先：先报告，经用户确认后再修复。用户要求审查 Python 代码（「review 一下」「代码审查」「检查一下这个 py」）或 Python 项目提交前触发；纯前端（Vue/TS）改动不触发。
 ---
 
 # 代码审查技能
@@ -36,34 +36,22 @@ description: Python 代码审查流程。运行代码质量检查工具（Flake8
 
 ### 第二步：运行代码质量工具（只读检查）
 
-**先探测项目工具链与检查范围，再执行：**
-- 工具调用方式：存在 `uv.lock` → `uv run <tool>`；存在 `poetry.lock` → `poetry run <tool>`；否则直接 `<tool>`
-- 检查范围：以第一步 `git diff` 涉及的文件/目录为准（下文记作 `<变更路径>`）
-- 工具参数：优先读取项目的 `setup.cfg` / `pyproject.toml` / `.flake8` 配置；项目无配置时才使用默认参数（行宽 88，忽略 E203/E501/W503）
+**先探测工具链，按优先级取第一个命中的，项目怎么规定就怎么跑：**
 
-按以下顺序执行，**本步骤一律只检查、不修改代码**：
+| 优先级 | 探测 | 执行 |
+|---|---|---|
+| 1 | 项目门禁入口：`scripts/check.sh` / `check.ps1`、`Makefile` 的 `check` 目标、AGENTS.md/CLAUDE.md 写明的检查命令（项目文档规定「lint 只用 pyflakes」也属于这一档，如 iPhoneUsbTouch） | 跑它的**只读**部分：会自动修复代码、或会改环境（`uv sync`、`pip install`、改锁文件）的步骤不跑，拆出其中的只读命令单独执行 |
+| 2 | `ruff.toml` / `.ruff.toml` / pyproject 里有 `[tool.ruff]` | `ruff check <变更路径>`；`ruff format --check --diff <变更路径>` |
+| 3 | `.flake8` / `setup.cfg [flake8]` / pyproject 里有 black、isort 配置 | `flake8 <变更路径> --statistics`；`black --check --diff`；`isort --check-only --diff` |
+| 4 | 以上都没有 | 能用 ruff 就用 ruff（`--select E,F,I,UP,B,W`，line-length 100）；没有 ruff 再退回 flake8 家族（行宽 88，忽略 E203/E501/W503）。在报告里注明「项目无 lint 配置，按默认规则检查」 |
 
-1. **Flake8** - 代码规范检查
-   ```bash
-   flake8 <变更路径> --statistics
-   ```
+另外：
+- 类型检查：配置了 mypy（`[tool.mypy]` / `mypy.ini`）就跑 `mypy <变更路径>`；strict 项目按 strict 来。
+- 命令前缀：有 `.venv/` → 直接用 `.venv/bin/<tool>`（不触发同步）；否则有 `uv.lock` → `uv run --frozen --no-sync <tool>`；有 `poetry.lock` → `poetry run <tool>`；再否则直接 `<tool>`。审查不能改动环境和锁文件。
+- 检查范围：以第一步 `git diff` 涉及的文件为准（下文记作 `<变更路径>`）。
+- 项目对中文标点做了豁免（如 RUF001-003）、FastAPI 项目放行了 B008 的，不要把这些规则报成问题。
 
-2. **Black** - 格式检查（仅 diff，不写入）
-   ```bash
-   black <变更路径> --check --diff
-   ```
-
-3. **isort** - 导入排序检查（不写入）
-   ```bash
-   isort <变更路径> --check-only --diff
-   ```
-
-4. **Mypy** - 类型检查（建议默认启用）
-   ```bash
-   mypy <变更路径>
-   ```
-
-> 所有修复（包括格式化与导入排序）统一在第九步用户确认后执行。
+**本步骤一律只检查、不修改代码。** 所有修复（含格式化、导入排序、`ruff --fix`）统一在第九步用户确认后执行。
 
 ### 第三步：SOLID 原则与架构审查
 
@@ -108,11 +96,17 @@ description: Python 代码审查流程。运行代码质量检查工具（Flake8
 
 标记可能导致静默失败或生产事故的问题。
 
+### 第六步半：梦无矶项目约定审查
+
+加载 `references/mwj-conventions.md`，逐条对照变更代码。这些都是在真实项目里踩过的坑：注释要写「为什么」和实测出处；设备/外部命令要用参数列表并带超时；ctypes 必须声明签名；对外协议只增不改；改了系统状态要独立回读验证；数据库要「复制 → 核对 → 切换」；凭据不能进代码和日志；测试要走真实入口；版本号只能有一个来源；确定性计算不能交给 AI。违反的按清单里标的级别报告。
+
 ### 第七步：分析工具检查结果
 
 根据工具输出分析问题类型：
 
 #### 常见问题类型
+
+> 下列代码在 Ruff 与 Flake8 中含义相同；Ruff 额外常见：`I001`（导入排序）、`UP*`（旧语法升级，如 `Optional[X]` → `X | None`）、`B*`（bugbear，如可变默认参数 B006、`raise` 未用 `from` B904）。
 
 **F401 - 导入但未使用**
 - 删除未使用的导入
@@ -172,10 +166,11 @@ description: Python 代码审查流程。运行代码质量检查工具（Flake8
 ---
 
 ### ✅ 工具检查结果
-- Flake8: X 个错误
-- Black: 已格式化
-- isort: 已排序
-- Mypy: X 个类型错误
+- 工具链：<门禁脚本或项目规定命令 / Ruff / Flake8+Black+isort>（探测依据：<配置文件>）
+- Lint：X 个问题
+- 格式：X 个文件需格式化
+- Mypy：X 个类型错误（未配置则写「未配置」）
+- 梦无矶约定：X 条
 
 ### 📊 统计信息
 - 检查文件数: X
@@ -251,11 +246,9 @@ description: Python 代码审查流程。运行代码质量检查工具（Flake8
 - `.pre-commit-config.yaml` - 若存在，说明项目已有提交前检查
 
 ### 项目无配置时的默认约定
-- 最大行长度: 88 字符
-- 格式化工具: Black
-- 导入排序: isort (black profile)
-- 代码检查: Flake8
-- 忽略规则（与 Black 配合）: E203（格式化空格）、E501（行长度由 Black 处理）、W503（二元运算符前换行）
+- 首选 Ruff：`--select E,F,I,UP,B,W`，line-length 100，`ruff format`
+- 无 Ruff 时退回：Flake8 + Black + isort（black profile），行宽 88，忽略 E203 / E501 / W503
+- 报告中注明使用的是默认规则；如果要给项目补 lint 配置，作为建议提出，不顺手改
 
 ---
 
@@ -341,7 +334,7 @@ git commit --no-verify -m "message"
 ### 建议的工作流程
 
 1. 修改代码
-2. 运行只读检查：`flake8 <变更路径> && black <变更路径> --check --diff && isort <变更路径> --check-only`
+2. 运行只读检查（按第二步探测到的工具链，例如 `ruff check <变更路径> && ruff format --check <变更路径>`）
 3. 查看审查结果
 4. 修复问题（经用户确认）
 5. 重新审查直到通过
@@ -352,8 +345,8 @@ git commit --no-verify -m "message"
 ## 注意事项
 
 ⚠️ **重要提醒：**
-- Black / isort 的修复会改写代码，只能在第九步用户确认后执行
-- Flake8 发现的问题必须修复才能通过 pre-commit
+- Black / isort / `ruff --fix` / `ruff format` 的修复会改写代码，只能在第九步用户确认后执行
+- Lint（Ruff / Flake8）发现的问题必须修复才能通过 pre-commit
 - Mypy 类型检查建议默认启用（配合全量类型注解）
 
 📝 **文档更新：**
@@ -374,10 +367,14 @@ git commit --no-verify -m "message"
 > `<变更路径>` 为 git diff 涉及的文件/目录；按项目工具链补全前缀（`uv run` / `poetry run` / 无）。
 
 ```bash
-# 完整只读检查
-flake8 <变更路径> --statistics && black <变更路径> --check --diff && isort <变更路径> --check-only --diff && mypy <变更路径>
+# Ruff 项目：只读检查
+ruff check <变更路径> && ruff format --check --diff <变更路径> && mypy <变更路径>
+# Ruff 项目：修复（仅在用户确认后执行）
+ruff check --fix <变更路径> && ruff format <变更路径>
 
-# 修复格式与导入排序（仅在用户确认后执行）
+# Flake8 家族项目：只读检查
+flake8 <变更路径> --statistics && black <变更路径> --check --diff && isort <变更路径> --check-only --diff && mypy <变更路径>
+# Flake8 家族项目：修复（仅在用户确认后执行）
 black <变更路径> && isort <变更路径>
 ```
 
@@ -391,6 +388,7 @@ black <变更路径> && isort <变更路径>
 | `references/security-risks.md` | Web/应用安全与运行时风险清单 |
 | `references/code-quality.md` | 错误处理、性能、边界条件 |
 | `references/cleanup-plan.md` | 删除候选项与后续计划模板 |
+| `references/mwj-conventions.md` | 梦无矶项目约定（真实踩坑提炼，含建议级别） |
 
 ---
 
@@ -423,9 +421,9 @@ black <变更路径> && isort <变更路径>
 
 📊 审查报告：
 - 检查文件：22 个
-- Flake8 错误：0
-- Black 格式化：已完成
-- isort 排序：已完成
+- Lint 问题：0（Ruff）
+- 格式：无需调整
+- 梦无矶约定：0
 - 架构问题：0
 - 安全风险：0
 
