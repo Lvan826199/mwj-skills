@@ -339,6 +339,16 @@ Linux 定版 → Windows 打包验收 → 审批 → 正式发布。
 
 ---
 
+### `/ios-usb-device-kb` — iOS 真机 USB 开发知识库
+
+免越狱、不用 WDA 的 iOS 真机开发知识，每条结论标注证据等级（真机 + iOS 版本 / 推断 / 未决）。
+
+**内容：** 版本矩阵（16–27+ 各能力可用性）、10 条硬规则、排障决策树（现象 → 先怎么做 → 详见哪个文件）；references 分为 CoreDevice HID 触控（单指 / 多指 dtuhidd 整帧报文、坐标与方向）、键盘表面 512 与 pasteboardservice 剪贴板、USB QuickTime 投屏（配置 5、usbmux 共存、卡顿根因）、Windows libusb 过滤驱动（UpperFilters 0x11、只写父节点、doctor）、sidecar 协议与真机联调守则、未决问题与参考仓库。
+
+**触发方式：** `/ios-usb-device-kb`，或做 iOS 触控、投屏、剪贴板、设备连接、Windows 驱动开发与排障时；看到 9021、IncompleteReadError、only audio、video_lost、GOAWAY 等现象时。
+
+---
+
 ## 目录结构
 
 ```
@@ -428,10 +438,13 @@ skills/
 │   └── references/
 │       ├── patterns.md                 # A–F 六种架构模式与通用原则
 │       └── test_architecture_template.py  # AST 依赖方向架构测试模板
-└── mwj-memory/
-    ├── SKILL.md                        # 记忆方案选型、写入、同步、审计
-    ├── scripts/memory_sync.py          # 三方同步与审计脚本
-    └── references/format.md            # 记忆格式规范与审计清单
+├── mwj-memory/
+│   ├── SKILL.md                        # 记忆方案选型、写入、同步、审计
+│   ├── scripts/memory_sync.py          # 三方同步与审计脚本
+│   └── references/format.md            # 记忆格式规范与审计清单
+└── ios-usb-device-kb/
+    ├── SKILL.md                        # 版本矩阵、硬规则、排障决策树
+    └── references/                     # 触控 / 键盘剪贴板 / 投屏 / Windows 驱动 / 协议与联调 / 未决问题
 
 .claude/
 ├── settings.json                       # 项目级 hook 配置

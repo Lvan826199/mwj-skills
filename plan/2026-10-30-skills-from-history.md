@@ -149,7 +149,7 @@
 - [x] F4 评估只在项目里有的 skill（design-system 的两份 reference 已收回；agent-rules-single-source 已并入 B1；msca-handoff 已由 device-handoff 覆盖，保留在 MSCA 项目内；mwj-autonomous-ui-skill-v3 与 ui-selfcheck 定位不同，暂留在项目内）：msca-handoff 已由 device-handoff 覆盖；agent-rules-single-source 并入 B1；mwj-autonomous-ui-skill-v3 和 design-system 多出的 reference 并入 C2
 - [x] B1 mwj-project-init（AGENTS.md 为源；在 scratchpad 生成 mwj-demo 实跑门禁全绿）
 - [x] C2 mwj-design-system v2.0（用户定：收编柔和变体、暂不做暗色、各项目可有自己风格；原计划的 core/实现层拆分改为不拆——需求已由适用范围 + 变体一节满足，避免大改 646 行引入回归）
-- [ ] D1–D3 领域 skill：用户 2026-10-30 决定这一轮不做。注意 mwj-skills 是公开仓库，以后要做时，先定好哪些内容放进项目内、不公开
+- [ ] D1–D3 领域 skill：2026-11-09 用户定——D2（iOS USB 真机知识）进 mwj-skills，需脱敏；D1、D3 不做
 
 ## 八、补全：编码习惯 / 架构 / 记忆（2026-10-30 用户追加）
 
@@ -170,3 +170,20 @@
 - rules.md：Selector 事件循环被写成通用规则 → 改为默认 Proactor；Optional 规则和「像周围代码」矛盾 → 改为跟随所在文件的写法。
 - 架构测试模板：一条违规报两次 → 改为按被禁的层只报一次；补扫 match 分支。新版在 AutoAppAgent 上 2 项通过，与项目自带的测试结论一致。
 - 公开仓库扫描：本次新增和改动没有敏感信息；方案文件里一个内部系统名已改成通用叫法。
+
+## 九、D2 iOS USB 真机知识库（2026-11-09 启动）
+
+- [x] H1 调研：从 iPhoneUsbTouch、imirror、MSCA 的记忆和文档提炼知识点（脱敏）
+- [x] H2 写 ios-usb-device-kb：SKILL.md + references
+- [x] H3 审查：事实核对 + 公开仓库敏感信息扫描
+- [x] H4 同步文档，提交推送
+
+### D2 审查结论（2026-11-09）
+
+对照原始文档和源码逐条核对，查出 3 处错误、7 处存疑，均已修正：
+- 剪贴板写入的超时：5s 等应答，再给 8s 核对；20s 是询问格式那一步的预算。
+- ready 留 150s 的原因：锁屏时激活要等 30～100 秒。
+- 卡顿：每 0.5 秒卡 100～200ms。
+- TCP-over-USB 是否重传：原始资料说法矛盾，改标「未决」。
+- 版本矩阵：27 列收窄为 27.0；26.x 的剪贴板写入改标真机。
+- 敏感信息扫描通过：没有设备号、内网信息、人名、私有远端、未公开 Demo 的细节。
