@@ -1,5 +1,10 @@
 # 更新日志
 
+## [记录常用插件] - 2026-11-09
+
+### 新增
+- 新增 `docs/常用插件.md`：常用 Claude Code 插件清单（版本、Marketplace、GitHub）、安装命令与 claude-hud / claude-mem 配置要求
+
 ## [编码习惯 / 架构 / 记忆三个 skill] - 2026-10-30
 
 ### 新增

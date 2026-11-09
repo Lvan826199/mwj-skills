@@ -442,9 +442,14 @@ scripts/
 └── sync_skills.py                      # skill 分发与漂移报告
 
 docs/
+├── 常用插件.md                          # 常用 Claude Code 插件清单与安装配置
 ├── changelog.md                        # 版本更新日志
 └── bug-fixes.md                        # Bug 修复记录
 ```
+
+## 常用插件
+
+工作中常用的 Claude Code 插件（claude-hud、skill-creator、superpowers、find-skills、claude-mem）及安装、配置方法见 [`docs/常用插件.md`](docs/常用插件.md)。
 
 ## Skill 分发
 
