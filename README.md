@@ -99,11 +99,17 @@ MWJ Design System v2.0 前端开发规范执行器，用于已采用 MWJ 白蓝�
 
 **v2.0 变化：** 先判断适用范围——每个项目可以有自己的风格，有独立风格的项目（Sujian、AutoAppAgent、MSCA 等）不强制套用；新增「标准 / 柔和」两个变体（柔和变体：页面底色 `#EEF2F8`、`--radius-lg` 20px、允许深色侧栏，用于 MoneyFree、MwjZhiWen、MwjAppPrefTrace）；收回下拉框规格 `select-dropdown-spec.md` 与柔和变体参照 `homepage-style-guide.md`；补 `--color-warning-bg` / `--color-danger-bg`。
 
+**项目自己的 DESIGN.md（2026-11-12）：** 判断适用范围时先找项目的 `DESIGN.md`（项目根，其次 `docs/`、`doc/`），有则以它为准；没有再从代码判断风格。有自己风格但还没有这份文件的项目，交付界面改动时会建议按 `references/design-md-template.md` 沉淀一份（写入须用户同意）。代码里看不出来的规则（例如"危险操作不用红色实底"）靠这份文件传达。
+
 **适用场景：** 开发/重构 Vue 组件、前端页面、UI 界面；涉及 Vue3 + TypeScript + TailwindCSS + Element Plus 的任何前端开发任务。
 
 **执行流程（三阶段）：**
 
 ```
+适用范围判断
+  → 项目有 DESIGN.md：以它为准（写明采用 MWJ 的继续走下面三阶段）
+  → 没有：从代码判断是 MWJ 还是独立风格
+        ↓
 Phase 1 · 分析阶段
   → 读取 MWJ 设计规范
   → 判断页面/组件类型（登录页/管理类/接口测试/功能测试/报告看板等）
@@ -372,7 +378,8 @@ skills/
 │   └── references/
 │       ├── migration-guide.md          # SCSS → CSS Token 迁移实战规则
 │       ├── select-dropdown-spec.md     # 下拉框样式规格
-│       └── homepage-style-guide.md     # 柔和变体落地参照（MwjAppPrefTrace 首页）
+│       ├── homepage-style-guide.md     # 柔和变体落地参照（MwjAppPrefTrace 首页）
+│       └── design-md-template.md       # 独立风格项目的 DESIGN.md 模板
 ├── ui-ux-pro-max-new/
 │   ├── SKILL.md                        # 设计智能助手主文件
 │   ├── data/                           # 设计数据库（配色/图表/风格/排版等 CSV）

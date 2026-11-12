@@ -1,5 +1,19 @@
 # 更新日志
 
+## [mwj-design-system 支持项目 DESIGN.md] - 2026-11-12
+
+### 新增
+- `mwj-design-system` 新增 `references/design-md-template.md`：给有自己风格的项目沉淀 `DESIGN.md` 用的精简模板（文件头 YAML token + 正文规则，写法沿用 Google Stitch 的 `DESIGN.md`），含填写说明、自查清单和 MWJ 项目的简写形式
+- `mwj-design-system` 新增「项目自己的 DESIGN.md」一节：何时向用户建议沉淀、怎么写、与代码保持同步，写入和修改须用户同意
+
+### 变更
+- `mwj-design-system`「适用范围」改为先找项目的 `DESIGN.md`（项目根，其次 `docs/`、`doc/`），有则以它为准，没有再从代码判断风格
+- 「项目用自己的风格时」的处理单列：借用条目与项目写法冲突时照项目的写并告知用户；没写到也没先例的问用户，不拿 MWJ Token 补
+- description 补充 `DESIGN.md` 相关触发条件
+
+### 修复
+- `mwj-design-system` 探测风格的 grep 命令在 zsh 下报 `no matches found`，见 `docs/bug-fixes.md`
+
 ## [补记审查发现的问题] - 2026-11-09
 
 ### 变更

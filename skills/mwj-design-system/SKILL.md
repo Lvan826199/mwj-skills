@@ -1,6 +1,6 @@
 ---
 name: mwj-design-system
-description: MWJ Design System v2.0 前端规范执行器（白蓝极简 SaaS 风格，含「标准」与「柔和」两个变体）。适用于已采用 MWJ 风格的项目（AiTestProject、game-auto 为标准变体；MoneyFree、MwjZhiWen、MwjAppPrefTrace 为柔和变体）或用户明确要求用 MWJ 风格时：写页面、组件、表单、表格、卡片、菜单、样式，或重构这些项目的前端。项目有自己的风格（如 Sujian、AutoAppAgent、MSCA）时不强制套用，以项目现有风格为准。
+description: MWJ Design System v2.0 前端规范执行器（白蓝极简 SaaS 风格，含「标准」与「柔和」两个变体）。适用于已采用 MWJ 风格的项目（AiTestProject、game-auto 为标准变体；MoneyFree、MwjZhiWen、MwjAppPrefTrace 为柔和变体）或用户明确要求用 MWJ 风格时：写页面、组件、表单、表格、卡片、菜单、样式，或重构这些项目的前端。项目有自己的风格（如 Sujian、AutoAppAgent、MSCA）时不强制套用，以项目的 `DESIGN.md` 或现有风格为准；要给项目沉淀或新定一份 `DESIGN.md` 时也用本 skill。
 ---
 
 # MWJ Design System v2.0 — 前端开发执行规范
@@ -11,18 +11,29 @@ description: MWJ Design System v2.0 前端规范执行器（白蓝极简 SaaS �
 
 **每个项目都可以有自己的风格，这套规范不是定死的。**（用户 2026-10-30 定）
 
-1. **先看项目现在用的是什么风格**：
+1. **先看项目有没有自己的 `DESIGN.md`**（项目根，其次 `docs/`、`doc/`）：
    ```bash
-   grep -rlE "#1677FF|--color-primary|components/mwj|Mwj[A-Z]" --include=*.{ts,js,vue,scss,css,html} . 2>/dev/null | grep -v node_modules | head
+   ls DESIGN.md docs/DESIGN.md doc/DESIGN.md 2>/dev/null
    ```
-   - 命中 MWJ Token 或 `Mwj*` 组件 → 本规范适用，接着第 2 步选变体。
-   - 项目有自己的一套风格（例如 Sujian 暖纸色、AutoAppAgent 青绿暗色、MSCA 的 Element 暗色主题）→ **以项目现有风格为准，不套用本规范**；只在用户需要时，借用下文与风格无关的部分（数据状态、可访问性、交付自检）。
-   - 新项目 → 问用户：用 MWJ（哪个变体），还是另定风格。
-2. **选变体**：沿用项目已有的 Token 值，见下文「变体」一节；新项目按场景选。
+   有就完整读一遍，它是这个项目风格的成文依据：
+   - 它写明采用 MWJ → 本规范适用，变体按它写的，跳到第 3 步。
+   - 它描述的是项目自己的风格 → 颜色、字体、圆角、层次、间距、组件样式都以它为准，**不套用本规范的 Token 和 `Mwj*` 组件**，其余按下面「项目用自己的风格时」处理。
+2. **没有 `DESIGN.md`，再看代码现在用的是什么风格**：
+   ```bash
+   grep -rlE "#1677FF|--color-primary|components/mwj|Mwj[A-Z]" --include=\*.{ts,js,vue,scss,css,html} . 2>/dev/null | grep -v node_modules | head
+   ```
+   - 命中 MWJ Token 或 `Mwj*` 组件 → 本规范适用，接着第 3 步选变体。
+   - 项目有自己的一套风格（例如 Sujian 暖纸色、AutoAppAgent 青绿暗色、MSCA 的 Element 暗色主题）→ **以项目现有风格为准，不套用本规范**，其余按下面「项目用自己的风格时」处理。交付时向用户提一句：可以把现有风格沉淀成 `DESIGN.md`，见「项目自己的 DESIGN.md」一节。
+   - 新项目 → 问用户：用 MWJ（哪个变体），还是另定风格；另定风格的，先定一份 `DESIGN.md` 再写页面。
+3. **选变体**：沿用项目已有的 Token 值，见下文「变体」一节；新项目按场景选。
+
+**项目用自己的风格时**（有没有 `DESIGN.md` 都一样），本规范只借用与风格无关的部分：数据状态、可访问性、交付自检。
+- 借用的条目和项目的写法冲突（例如焦点光环 `--shadow-focus` 遇上"不用阴影"，44px 点击区域遇上项目统一的 32px 按钮）→ 照项目的写，交付时把这处冲突告诉用户。
+- `DESIGN.md` 没写到、现有组件里也没有先例的（例如还没有任何弹层时的遮罩色）→ 问用户，不拿 MWJ Token 补。
 
 **规范文档位置：** 目标项目中的 `MWJ_Design_System.md`（18 章完整规范，通常位于项目根目录或 `doc/` 目录；缺失时见 Step 1 降级策略）
 
-**权威优先级：**
+**权威优先级（本规范适用时）：**
 1. MWJ Design Token（颜色/圆角/阴影/间距/字体/动效）— 最高优先级，不可覆盖
 2. MWJ 组件规范（`Mwj*` / `MwjBiz*` 前缀、Element Plus 封装）
 3. MWJ 布局系统（Header 64 / Sidebar 240 / 12 栅格）
@@ -126,6 +137,17 @@ python3 $UI_SKILL/scripts/search.py "aria focus keyboard semantic" --domain web
 - 判断项目用的是哪个变体：看 `--bg-page` 和 `--radius-lg` 的现值，**照现值写，不要顺手统一**。
 - 柔和变体已经落地的参照：`references/homepage-style-guide.md`（MwjAppPrefTrace 首页实际生效的样式）。
 - 两个变体都禁止硬编码色值；深色侧栏的颜色也要定义成 Token（例如 `--bg-sidebar`），不能在组件里直接写死。
+
+---
+
+## 项目自己的 DESIGN.md
+
+有自己风格的项目，把视觉规则写成一份 `DESIGN.md` 放在项目里，以后写界面先读它，不用每次从代码里猜。模板和填写说明见 `references/design-md-template.md`。
+
+- **什么时候提**：独立风格项目里没有这份文件 → 交付界面改动时向用户提一句；新项目另定风格 → 先按模板定一份，再写页面。
+- **怎么写**：写代码里已经生效的值，token 名与代码一致；代码里看不出来的规则（该做 / 不该做）是重点，要问用户，不从代码反推了当定论；没定稿的写进「已知缺口」。
+- **保持同步**：改了风格（token 值、组件样式），同一次提交里更新 `DESIGN.md`。
+- 写入和修改 `DESIGN.md` 都要用户同意。
 
 ---
 
@@ -685,5 +707,5 @@ Token（设计令牌） → Component（组件系统） → Page（页面装配�
 
 ---
 
-> 本规范基于 MWJ_Design_System.md v1.2（18 章完整规范），v2.0 新增了适用范围、柔和变体和下拉框规格。采用 MWJ 风格的项目，页面与组件开发都必须遵循本规范。
+> 本规范基于 MWJ_Design_System.md v1.2（18 章完整规范），v2.0 新增了适用范围、柔和变体和下拉框规格，并支持项目自己的 `DESIGN.md`。采用 MWJ 风格的项目，页面与组件开发都必须遵循本规范。
 
