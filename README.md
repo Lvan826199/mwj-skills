@@ -191,7 +191,7 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 
 把读多写少、可独立验证的子任务委派给本地 CLI 智能体（`kimi-cli` / `codex exec` / `claude -p`），并行执行后由主 agent 严格验收，不满意可要求重做（最多 3 次），每次任务结束输出 token 用量与节省估算报告。
 
-**6 种执行模式：**
+**7 种执行模式：**
 
 | 模式 | 适用场景 |
 |------|----------|
@@ -201,6 +201,7 @@ python3 skills/ui-ux-pro-max-new/scripts/search.py "dashboard admin saas" --stac
 | 4. kimi + codex 并行 | 要快又要二审，两边一致 = 高置信，分歧由主 agent 亲核 |
 | 5. 主 agent 终审 + token 报告 | 可追加在任意模式之后收尾（建议每次都跑） |
 | 6. claude-only（headless） | 环境没装 kimi/codex 或需要更强模型；按 Claude 系列分级选型：fable-5（最难）→ opus-4.8（默认）→ opus-4.6（降级）→ sonnet-4.6（批量并发）→ haiku-4.5（机械任务），优先使用当前环境可用的模型 |
+| 7. 内置子代理降级 | kimi/codex/claude 命令行都用不了时，直接派会话内 `Agent` 子代理顶替（较快档顶 kimi、最强档顶 codex），不先问；流程不变，token 报告改为人工汇总 |
 
 **核心流程（7 步）：** 拆任务 → 写结构化 prompt（检查点清单 + 行号证据要求）→ 并发起飞 → 4 关验收（完整性/格式/抽查强声明/结论一致性）→ 不满意重做（追加反馈，最多 3 次）→ 主 agent 综合自核 → 输出 token 报告。
 

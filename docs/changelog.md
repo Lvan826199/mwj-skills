@@ -1,5 +1,14 @@
 # 更新日志
 
+## [项目副本漂移收口] - 2026-11-16
+
+### 新增
+- `delegate-to-cli` 新增 Mode 7「内置子代理降级」：kimi/codex/claude 命令行都不可用时，直接派会话内 `Agent` 子代理顶替，不先问；收回自 AiTestProject 副本（原为项目内的 Mode 6，2026-07-08 用户定版）
+
+### 变更
+- AiTestProject 的 `py-code-review`、`ui-ux-pro-max-new`、`mwj-design-system`、`delegate-to-cli` 副本更新到本仓库最新版
+- `req-doc-generator` 的 AiTestProject 副本保留项目定制（文档路径、数据库设计文档由 ORM 生成），不收回、不覆盖
+
 ## [mwj-design-system 支持项目 DESIGN.md] - 2026-11-12
 
 ### 新增

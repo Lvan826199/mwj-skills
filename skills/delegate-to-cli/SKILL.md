@@ -1,6 +1,6 @@
 ---
 name: delegate-to-cli
-description: 把读多写少、可独立验证的子任务委派给本地 CLI 智能体（kimi-cli / codex / claude），并行起飞，回收后由你严格验收，不满意要它重做（最多 3 次）。支持 6 种模式：纯 kimi、纯 codex、kimi 跑+codex 复审、kimi+codex 并行、外部 sub-agent 跑完 + 主 agent 终审、纯 claude（Claude Code headless，按 fable-5/opus-4.8/opus-4.6/sonnet-4.6 分级选型，优先使用当前环境可用的 CLI 与模型）。每次跑完输出每个 sub-agent 的 token 用量及对比 Claude 单跑的节省比例。当用户提到"派 kimi/codex/claude 跑"、"指挥 sub-agent"、"分发任务"、"整体巡检/审计/对账"、"再用 codex/kimi 复审一遍"时触发；当主任务可拆成 2 个以上互不依赖、读多写少的并发子任务时也应主动考虑触发。
+description: 把读多写少、可独立验证的子任务委派给本地 CLI 智能体（kimi-cli / codex / claude），并行起飞，回收后由你严格验收，不满意要它重做（最多 3 次）。支持 7 种模式：纯 kimi、纯 codex、kimi 跑+codex 复审、kimi+codex 并行、外部 sub-agent 跑完 + 主 agent 终审、纯 claude（Claude Code headless，按 fable-5/opus-4.8/opus-4.6/sonnet-4.6 分级选型，优先使用当前环境可用的 CLI 与模型）、内置子代理降级（外部 CLI 都不可用时直接用会话内 Agent 子代理顶替，不先问）。每次跑完输出每个 sub-agent 的 token 用量及对比 Claude 单跑的节省比例。当用户提到"派 kimi/codex/claude 跑"、"指挥 sub-agent"、"分发任务"、"整体巡检/审计/对账"、"再用 codex/kimi 复审一遍"时触发；当主任务可拆成 2 个以上互不依赖、读多写少的并发子任务时也应主动考虑触发。
 ---
 
 # Delegate-to-CLI
@@ -23,7 +23,7 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 - 跨子任务有数据依赖 → 不能并发，分开主 agent 做更快
 - 涉及需要审批、产生副作用、动 git/远端的操作 → 主 agent 做，留审批链路
 
-## 6 种执行模式
+## 7 种执行模式
 
 按"任务确定性 / 你对 sub-CLI 的信任度 / 时间预算"组合选择。
 
@@ -58,7 +58,7 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 2. 主 agent 抽查 4-6 条强声明（用 Read/Bash 自己核）
 3. 输出综合报告 + 调用 `token_report.py` 出 token 节省估算
 
-> 这个模式可以追加在 Mode 1/2/3/4/6 任意一个之后。强烈建议每次都跑 Mode 5 收尾。
+> 这个模式可以追加在 Mode 1/2/3/4/6/7 任意一个之后。强烈建议每次都跑 Mode 5 收尾。
 
 ### Mode 6: claude-only（Claude Code headless）
 **何时用**：精确代码语义任务（行号、调用图、函数签名审计）与中文报告型任务都能胜任；**当前环境没装 kimi/codex、或任务难度需要 Claude 系列更强模型时的首选**。
@@ -77,6 +77,13 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 
 > 与 Mode 3/4 组合时，claude 可以顶替 kimi 或 codex 的位置（如 sonnet-4.6 跑第一轮 + opus-4.8 复审）。
 
+### Mode 7: 内置子代理降级（外部 CLI 都不可用时）
+**何时用**：`command -v kimi-cli codex claude` 都找不到，或缺认证配置（`~/.kimi` / `~/.codex` / claude 未登录），或当前环境不允许再起 `claude -p` 子进程。**不要阻塞、不要先问用户装不装，直接降级**（2026-07-08 用户定版，收回自 AiTestProject）。
+**流程**：拆任务 → 并发派当前会话的内置 `Agent` 子代理 → 主 agent 抽查 → 综合。
+**角色顶替**：较快的档位（如 sonnet）顶替 kimi 角色，做中文文档审计、对账、报告型任务；最强的档位（如 opus）顶替 codex 角色，做行号级代码语义审计、复审。档位按 Mode 6 分级表的思路选，以 `Agent` 工具实际支持的取值为准。
+**典型场景**：Mode 1–4 的任意任务在无外部 CLI 环境下等价执行，例如 Mode 3 降级为 sonnet 先跑、opus 复审。prompt 模板、4 关验收、重做 ≤3 次的流程完全不变。
+**注意**：没有外部 CLI 的 token 日志，`token_report.py` 不适用；token 报告改为人工汇总 `Agent` 工具返回的用量，并注明「降级模式：内置子代理」。
+
 ## 适合派给 sub-CLI 的子任务特征（必须全部满足）
 
 1. **只读为主**：grep / 读文件 / 列举 / 比对清单 / 写报告
@@ -92,7 +99,7 @@ description: 把读多写少、可独立验证的子任务委派给本地 CLI �
 | 默认 | 中文报告 / 文档对账 / 探索性问题 | 代码语义检查 / 行号级证据 / cross-check |
 | Token 计费 | input_other + cache_read 拆开计 | 只给一个聚合 `tokens used`，区分粒度低 |
 
-不确定时默认用 kimi（cache 友好），结果可疑用 Mode 3 跑 codex cross-check。**环境里没有 kimi/codex，或子任务难度超出两者能力时，走 Mode 6 用 claude（按模型分级表选档）。**
+不确定时默认用 kimi（cache 友好），结果可疑用 Mode 3 跑 codex cross-check。**环境里没有 kimi/codex，或子任务难度超出两者能力时，走 Mode 6 用 claude（按模型分级表选档）；`claude -p` 也用不了时走 Mode 7。**
 
 ## 调用模板
 
