@@ -54,8 +54,8 @@ python scripts/sync_skills.py push-projects [--apply]  # 更新各项目里已�
 - 用户级用软链（改一处立即生效）；项目副本跟项目仓库走、需在 Windows 可用，用复制
 - 副本里有本仓库没有的文件时脚本拒绝覆盖：先评估并收回本仓库，再分发
 - 在项目里直接改过的 skill（如 lint 修复），先判断差异方向，较新的一方收回本仓库
-- 有意保留的项目定制，`push-projects` 时必须用 `--only` 避开（脚本没有跳过机制，不加 `--only` 会覆盖）：
-  - `AiTestProject/.claude/skills/req-doc-generator`：项目文档路径与「数据库设计文档由 ORM 生成」（2026-11-16 用户定）
+- 有意保留的项目定制登记在 `scripts/sync_keep.json`（`{副本路径: 保留原因}`）：`check` 标为 KEEP，`push-projects` 一律跳过，`--only` 点名也不覆盖；要覆盖先从清单里删掉那一条，且须经用户同意
+- `push-projects` 不往项目里新增 skill；项目需要新的 skill 时手动复制一次（须经用户同意），之后就由脚本保持同步
 
 ---
 

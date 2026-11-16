@@ -460,7 +460,11 @@ skills/
     └── check-commit.py                 # git commit 拦截脚本
 
 scripts/
-└── sync_skills.py                      # skill 分发与漂移报告
+├── sync_skills.py                      # skill 分发与漂移报告
+└── sync_keep.json                      # 有意保留、不覆盖的项目副本清单
+
+tests/
+└── test_sync_skills.py                 # 分发脚本保留清单测试
 
 docs/
 ├── 常用插件.md                          # 常用 Claude Code 插件清单与安装配置
@@ -478,9 +482,13 @@ docs/
 
 | 子命令 | 作用 |
 |--------|------|
-| `check` | 报告 `~/.claude/skills` 与各项目副本相对本仓库的漂移（SAME / DIFF / MISS / ONLY） |
+| `check` | 报告 `~/.claude/skills` 与各项目副本相对本仓库的漂移（SAME / DIFF / KEEP / MISS / ONLY） |
 | `link-user` | 在 `~/.claude/skills` 下建软链指向本仓库；旧复制件挪到 `.trash/` |
-| `push-projects` | 用本仓库更新各项目里已存在的副本（复制，不新增）；副本有独有文件时拒绝覆盖 |
+| `push-projects` | 用本仓库更新各项目里已存在的副本（复制，不新增）；副本有独有文件时拒绝覆盖；`scripts/sync_keep.json` 里登记的副本一律跳过 |
+
+有意保留的项目定制写进 `scripts/sync_keep.json`，格式为 `{"<项目>/.claude/skills/<skill>": "保留原因"}`。清单里的条目对不上任何副本时，`check` 会提示清理。
+
+测试：`uvx pytest tests/`
 
 ## Hook 配置说明
 

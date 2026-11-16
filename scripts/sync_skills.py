@@ -8,7 +8,8 @@
   只更新已经存在的副本，不往项目里新增 skill。
 
 默认只演练（打印将做什么），加 --apply 才写入。副本里有本仓库没有的
-文件时不覆盖——那是要先收回本仓库的内容。
+文件时不覆盖——那是要先收回本仓库的内容。有意保留的项目定制登记在
+scripts/sync_keep.json，check 标为 KEEP，push-projects 一律跳过。
 
     python scripts/sync_skills.py check
     python scripts/sync_skills.py link-user [--apply]
@@ -19,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import filecmp
+import json
 import shutil
 import sys
 from dataclasses import dataclass, field
@@ -33,6 +35,8 @@ USER_TRASH = USER_SKILLS / ".trash"
 DEFAULT_PROJECTS_ROOT = REPO_ROOT.parent
 PROJECT_SKILL_DIRS = (".claude/skills", "skills")
 IGNORED_NAMES = {"__pycache__", ".DS_Store"}
+# 有意保留的项目副本：{相对项目根目录的副本路径: 保留原因}
+KEEP_FILE = REPO_ROOT / "scripts" / "sync_keep.json"
 
 
 @dataclass
@@ -87,6 +91,18 @@ def project_copies(projects_root: Path) -> list[Path]:
     return found
 
 
+def load_keep(path: Path) -> dict[str, str]:
+    """读保留清单；文件不存在视为空清单。"""
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or not all(
+        isinstance(k, str) and isinstance(v, str) for k, v in data.items()
+    ):
+        raise ValueError(f"{path} 必须是 {{副本路径: 保留原因}} 形式的 JSON 对象")
+    return data
+
+
 def describe(drift: Drift) -> str:
     parts = []
     if drift.changed:
@@ -98,7 +114,7 @@ def describe(drift: Drift) -> str:
     return "；".join(parts)
 
 
-def cmd_check(projects_root: Path) -> int:
+def cmd_check(projects_root: Path, keep: dict[str, str]) -> int:
     names = set(source_skills())
     print("== 用户级 ~/.claude/skills")
     for name in sorted(names):
@@ -113,13 +129,21 @@ def cmd_check(projects_root: Path) -> int:
         else:
             print(f"MISS  {name}")
     print(f"\n== 项目副本（{projects_root}）")
+    seen: set[str] = set()
     for copy in project_copies(projects_root):
         rel = copy.relative_to(projects_root)
+        seen.add(rel.as_posix())
         if copy.name not in names:
             print(f"ONLY  {rel}（本仓库没有，待评估是否收回）")
             continue
         drift = compare(SOURCE_DIR / copy.name, copy)
+        if rel.as_posix() in keep:
+            print(f"KEEP  {rel} {describe(drift)}（{keep[rel.as_posix()]}）")
+            continue
         print(f"{'SAME ' if drift.same else 'DIFF '} {rel} {describe(drift)}")
+    # 清单里对不上任何副本的条目多半是项目改名或删了副本，提示清理
+    for stale in sorted(set(keep) - seen):
+        print(f"!! 保留清单里的 {stale} 不存在，请核对 {KEEP_FILE.name}")
     return 0
 
 
@@ -151,13 +175,19 @@ def cmd_link_user(apply: bool) -> int:
     return 0
 
 
-def cmd_push_projects(projects_root: Path, apply: bool, only: list[str]) -> int:
+def cmd_push_projects(
+    projects_root: Path, apply: bool, only: list[str], keep: dict[str, str]
+) -> int:
     names = set(source_skills())
     blocked = 0
     for copy in project_copies(projects_root):
         if copy.name not in names or (only and copy.name not in only):
             continue
         rel = copy.relative_to(projects_root)
+        # 即使 --only 点名也跳过：要覆盖，先从清单里删掉这一条
+        if rel.as_posix() in keep:
+            print(f"== {rel}: 有意保留，跳过：{keep[rel.as_posix()]}")
+            continue
         drift = compare(SOURCE_DIR / copy.name, copy)
         if drift.same:
             continue
@@ -186,11 +216,16 @@ def main(argv: list[str] | None = None) -> int:
         help="项目根目录，默认是本仓库的上级目录",
     )
     args = parser.parse_args(argv)
-    if args.command == "check":
-        return cmd_check(args.projects_root)
     if args.command == "link-user":
         return cmd_link_user(args.apply)
-    return cmd_push_projects(args.projects_root, args.apply, args.only)
+    try:
+        keep = load_keep(KEEP_FILE)
+    except ValueError as exc:  # json.JSONDecodeError 也是 ValueError
+        print(f"!! 保留清单读不了：{exc}。请修正 {KEEP_FILE} 后重试", file=sys.stderr)
+        return 2
+    if args.command == "check":
+        return cmd_check(args.projects_root, keep)
+    return cmd_push_projects(args.projects_root, args.apply, args.only, keep)
 
 
 if __name__ == "__main__":
