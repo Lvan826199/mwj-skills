@@ -36,6 +36,7 @@
 | `mwj-python-style` | `/mwj-python-style` 或在 Python 项目写代码时；说"按我的风格写" | 写代码时就遵守的编码习惯，规则唯一清单与 py-code-review 共用 |
 | `mwj-architecture` | `/mwj-architecture` 或说"用什么架构"、"分层"、"补架构测试" | A–F 六种架构模式库、选型表、越层判断、AST 依赖方向架构测试模板 |
 | `mwj-memory` | `/mwj-memory` 或说"记忆进仓库"、"同步记忆"、"审计记忆" | 记忆方案选型、写入规范、三方同步脚本（冲突不覆盖、敏感拦截）与审计 |
+| `mwj-guide-site` | `/mwj-guide-site` 或说"做个指南页 / 上手页"、"把文档做成网页"、"照这个风格做个网页" | 新手指南网页：浅蓝白卡片风格、三档主题、步骤卡 + 进度勾选、指令点击复制、更新记录折叠；纯静态 + 本地 marked.js，附生成脚本与内网自托管（开机自启）说明 |
 | `ios-usb-device-kb` | `/ios-usb-device-kb` 或做 iOS 触控、投屏、剪贴板、Windows 驱动开发排障时 | iOS 真机 USB 开发知识库：版本矩阵、硬规则、排障决策树、分主题参考（证据分级） |
 
 ---

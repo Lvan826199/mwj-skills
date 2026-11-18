@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- MWJ Guide Site 页面骨架。{{…}} 由 build_site.py 替换；其余中文是示例，按 SKILL.md 第 1 步收集的内容改写。段落可删，不要加新样式。 -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{TITLE}} · 新手指南</title>
+<script>try{var t=localStorage.getItem('qa-theme');if(t&&t!=='auto')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/guide.css"><script src="assets/marked.min.js"></script></head>
+<body>
+<header class="site-header"><div class="header-inner">
+  <a class="brand" href="#top"><span class="logo">{{LOGO}}</span>{{TITLE}}</a>
+  <nav class="header-nav"><a href="#start">快速上手</a><a href="#usage">日常用法</a><a href="#upgrade">升级</a><a href="#changelog">更新记录</a><a href="#faq">常见问题</a></nav>
+  <div class="theme-picker" role="group" aria-label="页面主题"><button data-t="auto">跟随系统</button><button data-t="light">浅色</button><button data-t="dark">深色</button></div>
+</div></header>
+<main class="page" id="top">
+<!-- 首屏：标题一句话（<em> 强调一个短语），副标题 2～3 行，两个按钮（主：开始上手；次：下载），一行注脚（平台 · 耗时 · 关键默认）；右侧示例卡 3～5 条 -->
+<section class="hero">
+  <div>
+    <div class="kicker">从这里，开始第一次使用 <span class="badge">{{VER}}</span></div>
+    <h1>一句话说清价值，<br><em>强调最关键的那个短语</em>。</h1>
+    <p class="lead">它做什么、怎么做到的、边界在哪（不做什么）。两三行就够。</p>
+    <div class="hero-actions"><a class="button primary" href="#start">开始上手</a><a class="button ghost" href="files/doc0.md" download="{{DOC0}}">下载 {{VER_SHORT}}</a></div>
+    <p class="hero-note">支持平台 · 上手耗时 · 一条最重要的默认行为</p>
+  </div>
+  <div class="hero-card"><div class="chat">
+    <div class="msg"><span class="who">用户 · 场景</span>典型输入</div>
+    <div class="msg bot"><span class="who">工具</span>它怎么处理（虚线框 = 工具的动作）</div>
+    <div class="msg me"><span class="who">你</span>你的一步操作（右对齐蓝底 = 本人）</div>
+  </div></div>
+</section>
+
+<!-- 先认识它：3～4 步流程 + 2～3 种结果（绿 g = 自动完成，蓝 b = 等你确认，琥珀 a = 交给你 / 注意） -->
+<section class="block">
+  <div class="section-heading"><div class="section-kicker">先认识它</div><h2>一次使用会经过这几步</h2><p>一句话说明原理和安全边界。</p></div>
+  <div class="workflow">
+    <div class="wf"><span class="n">1</span><b>第一步</b><span>一句话。</span></div>
+    <div class="wf"><span class="n">2</span><b>第二步</b><span>一句话。</span></div>
+    <div class="wf"><span class="n">3</span><b>第三步</b><span>一句话。</span></div>
+    <div class="wf"><span class="n">4</span><b>第四步</b><span>一句话。</span></div>
+  </div>
+  <div class="outcomes">
+    <div class="oc g"><b>结果一</b><span>什么条件下。</span></div>
+    <div class="oc b"><b>结果二</b><span>什么条件下。</span></div>
+    <div class="oc a"><b>结果三</b><span>什么条件下。</span></div>
+  </div>
+</section>
+
+<!-- 开始前 + 编号步骤卡 + 右侧进度（data-s 与步骤一一对应） -->
+<section class="block" id="start">
+  <div class="section-heading"><div class="section-kicker">Before you start</div><h2>开始前，准备这几样</h2><p>缺了怎么办（谁会帮你检查 / 装）。</p></div>
+  <div class="req">
+    <div><b>运行环境</b><span>一句话。</span></div>
+    <div><b>依赖工具</b><span>一句话，命令用 <code>code</code>。</span></div>
+    <div><b>账号</b><span>谁来登录，不代填凭据。</span></div>
+    <div><b>其他</b><span>一句话。</span></div>
+  </div>
+  <div class="guide-layout">
+    <div>
+      <div class="step-card" id="s1"><div class="step-heading"><span class="no">01</span><h3>下载</h3></div>
+        <p>一句话说明下载的是什么。</p>
+        <div class="hero-actions" style="margin-top:14px"><a class="button primary" href="files/doc0.md" download="{{DOC0}}">下载</a><a class="button ghost" href="view.html?f=doc0.md&n={{DOC0}}">在线看全文</a></div></div>
+      <div class="step-card" id="s2"><div class="step-heading"><span class="no">02</span><h3>安装 / 运行</h3></div>
+        <p>一句话。</p>
+        <div class="cmd"><code>示例命令</code><button class="copy-button" data-copy="示例命令">复制</button></div></div>
+      <div class="step-card" id="s3"><div class="step-heading"><span class="no">03</span><h3>确认关键设置</h3></div>
+        <p>一句话。</p>
+        <div class="callout">需要特别提醒的默认行为或风险（琥珀色）。</div></div>
+    </div>
+    <aside class="progress-card" aria-label="上手进度"><h3>上手进度 <span id="pc">0 / 3</span></h3><div class="bar"><i id="pb"></i></div>
+      <label><input type="checkbox" data-s="1">下载</label><label><input type="checkbox" data-s="2">安装 / 运行</label><label><input type="checkbox" data-s="3">确认关键设置</label>
+      <button class="reset" id="reset">重置进度</button></aside>
+  </div>
+</section>
+
+<!-- 日常用法：按用途分组，每组标题 + 一句说明 + 指令（点击复制） -->
+<section class="block" id="usage">
+  <div class="section-heading"><div class="section-kicker">日常用法</div><h2>常用操作</h2><p>点指令可以复制；说明占位符怎么替换。</p></div>
+  <div class="usage">
+    <div class="use"><h3>用途一</h3><p>一句话。</p><div class="tags"><code>指令 A</code><code>指令 B</code></div></div>
+    <div class="use"><h3>用途二</h3><p>一句话。</p><div class="tags"><code>指令 C</code></div></div>
+  </div>
+</section>
+
+<!-- 升级：编号 + 命令 + 注意事项 -->
+<section class="block" id="upgrade">
+  <div class="section-heading"><div class="section-kicker">已经装过</div><h2>升级到 {{VER_SHORT}}</h2><p>升级会不会覆盖你的设置，一句话说清。</p></div>
+  <div class="step-card" style="margin-top:24px">
+    <div class="step-heading"><span class="no">①</span><h3>第一步</h3></div>
+    <div class="cmd"><code>升级命令</code><button class="copy-button" data-copy="升级命令">复制</button></div>
+    <div class="callout">升级后的注意事项。</div>
+  </div>
+</section>
+
+<!-- 更新记录：CHANGELOG 按「## 」切段折叠，最新一段默认展开 -->
+<section class="block" id="changelog">
+  <div class="section-heading"><div class="section-kicker">更新记录</div><h2>每个版本改了什么</h2></div>
+  <div class="changelog" id="cl"></div>
+  <script type="text/markdown" id="cl-src">{{CHANGELOG}}</script>
+</section>
+
+<section class="block" id="files">
+  <div class="section-heading"><div class="section-kicker">下载</div><h2>文档和文件</h2></div>
+  <div class="downloads">{{DOWNLOADS}}</div>
+</section>
+
+<!-- 常见问题：4～6 条，安全 / 隐私 / 权限 / 出问题找谁 -->
+<section class="block faq" id="faq">
+  <div class="section-heading"><div class="section-kicker">常见问题</div><h2>常见问题</h2></div>
+  <div style="margin-top:16px">
+    <details><summary>问题一？</summary><p>回答。</p></details>
+    <details><summary>遇到问题找谁？</summary><p>{{CONTACT}}</p></details>
+  </div>
+</section>
+</main>
+<footer class="site-footer">{{TITLE}} {{VER}} · {{CONTACT}}</footer>
+<div class="toast" id="toast">已复制</div>
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.theme-picker button');
+  function cur(){try{return localStorage.getItem('qa-theme')||'auto'}catch(e){return 'auto'}}
+  function apply(t){if(t==='auto')delete root.dataset.theme;else root.dataset.theme=t;btns.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.t===t)});try{localStorage.setItem('qa-theme',t)}catch(e){}}
+  btns.forEach(function(b){b.onclick=function(){apply(b.dataset.t)}});apply(cur());
+  var toast=document.getElementById('toast');
+  function copy(s){(navigator.clipboard&&window.isSecureContext?navigator.clipboard.writeText(s):Promise.reject()).catch(function(){var a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}).finally(function(){toast.classList.add('on');setTimeout(function(){toast.classList.remove('on')},1200)})}
+  document.querySelectorAll('[data-copy]').forEach(function(b){b.onclick=function(){copy(b.dataset.copy)}});
+  document.querySelectorAll('.tags code').forEach(function(c){c.onclick=function(){copy(c.textContent)}});
+  var boxes=document.querySelectorAll('.progress-card input'),pc=document.getElementById('pc'),pb=document.getElementById('pb');
+  function load(){try{return JSON.parse(localStorage.getItem('qa-progress')||'[]')}catch(e){return []}}
+  function render(){var n=0;boxes.forEach(function(x){if(x.checked)n++});pc.textContent=n+' / '+boxes.length;pb.style.width=(n/boxes.length*100)+'%'}
+  var saved=load();boxes.forEach(function(x){x.checked=saved.indexOf(x.dataset.s)>=0;x.onchange=function(){var s=[];boxes.forEach(function(y){if(y.checked)s.push(y.dataset.s)});try{localStorage.setItem('qa-progress',JSON.stringify(s))}catch(e){}render()}});render();
+  document.getElementById('reset').onclick=function(){boxes.forEach(function(x){x.checked=false});try{localStorage.removeItem('qa-progress')}catch(e){}render()};
+  var src=document.getElementById('cl-src').textContent,cl=document.getElementById('cl'),parts=src.split(/\n(?=## )/).filter(function(p){return /^## /.test(p)});
+  parts.forEach(function(p,i){var nl=p.indexOf('\n'),title=p.slice(3,nl).trim(),body=p.slice(nl+1);var d=document.createElement('details');if(i===0)d.open=true;
+    var s=document.createElement('summary');s.textContent=title;var b=document.createElement('div');b.className='body';b.innerHTML=window.marked?marked.parse(body.replace(/</g,'&lt;')):'';d.appendChild(s);d.appendChild(b);cl.appendChild(d)});
+})();
+</script>
+</body></html>

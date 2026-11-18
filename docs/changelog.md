@@ -1,5 +1,11 @@
 # 更新日志
 
+## [新增 mwj-guide-site] - 2026-11-18
+
+### 新增
+- `mwj-guide-site`：新手指南网页 skill（用户 11-18：「这种网页风格我很喜欢」）。附 `assets/guide.css`、本地 `marked.min.js`、`references/template.html`（含每段写法说明）、`references/build_site.py`（site.json 驱动，版本号从源码读，生成指南页 + 文档阅读页）、`references/self-host.md`（macOS LaunchAgent / LaunchDaemon、Windows 计划任务）
+- 自检里记下无头 Chrome 窗口最小约 485 宽、手机宽度截图会误判溢出的坑
+
 ## [项目副本漂移收口] - 2026-11-16
 
 ### 新增

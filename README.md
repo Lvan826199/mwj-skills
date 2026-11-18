@@ -262,6 +262,18 @@ Linux 定版 → Windows 打包验收 → 审批 → 正式发布。
 
 ---
 
+### `/mwj-guide-site` — 新手指南网页
+
+给工具、插件、内部助手做一个「3 分钟看懂怎么用」的上手页：浅蓝白卡片风格，顶部吸顶导航 + 跟随系统 / 浅色 / 深色三档主题。
+
+**页面结构：** 首屏价值一句话 + 两个按钮 + 右侧示例卡 → 「先认识它」流程与结果 → 开始前准备 → 编号步骤卡 + 右侧上手进度勾选 → 日常用法（指令点击复制）→ 升级 → 更新记录（CHANGELOG 按版本折叠）→ 下载卡片 → 常见问题。
+
+**怎么做：** 先收集内容（不编）→ 用附带的 `guide.css` + `template.html` + `build_site.py`（site.json 驱动，版本号从源码读）生成 → 需要内网访问时按 `self-host.md` 自托管（macOS LaunchAgent / LaunchDaemon 开机自启，Windows 计划任务）→ 按 `ui-selfcheck` 截图自检（含手机宽度截图的坑）。
+
+**触发方式：** `/mwj-guide-site`，或说"做个指南页"、"把文档做成网页方便别人看和下载"、"照这个风格做个网页"。
+
+---
+
 ### `/ui-selfcheck` — 界面改动截图自检
 
 前端改动后，在隔离数据上起服务，用无头浏览器多视口、多状态截图，跑机器检查，再逐张亲自看图，修完重截，确认没问题才交给人。
@@ -415,6 +427,15 @@ skills/
 │   └── references/
 │       ├── version-locations.md        # 各技术栈版本号位置与规则
 │       └── windows-build-prompt.md     # Windows 打包验收提示词骨架
+├── mwj-guide-site/
+│   ├── SKILL.md                        # 新手指南网页
+│   ├── assets/
+│   │   ├── guide.css                   # 全部样式（Token + 组件）
+│   │   └── marked.min.js               # 本地 Markdown 渲染（不依赖外网）
+│   └── references/
+│       ├── template.html               # 页面骨架（含每段写法说明）
+│       ├── build_site.py               # 生成脚本（site.json 驱动）
+│       └── self-host.md                # 内网自托管与开机自启
 ├── ui-selfcheck/
 │   ├── SKILL.md                        # 界面改动截图自检
 │   ├── scripts/shot.py                 # 通用无头截图 + 机器检查脚本
